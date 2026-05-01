@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melvin Leok, Ph.D. | Computational Geometric Mechanics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ucsd-blue: #182B49;
+            --ucsd-gold: #C69214;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #F7F9FC;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--ucsd-gold);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%);
+            color: var(--white);
+            padding: 80px 5%;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .hero p.title {
+            font-size: 1.2rem;
+            color: var(--ucsd-gold);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .hero p.affiliation {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            opacity: 0.9;
+        }
+
+        /* Container & Cards */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 5%;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--ucsd-blue);
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--ucsd-gold);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: var(--ucsd-blue);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        ul.styled-list {
+            list-style-position: inside;
+            color: var(--text-light);
+        }
+
+        ul.styled-list li {
+            margin-bottom: 10px;
+        }
+
+        /* Contact Section */
+        .contact-info {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .contact-block {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .contact-block strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--ucsd-blue);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 2.2rem; }
+            nav { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1>mleok.science</h1>
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#research">Research</a></li>
+            <li><a href="#honors">Honors</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h2>Melvin Leok, Ph.D.</h2>
+        <p class="title">Professor of Mathematics</p>
+        <p class="affiliation">Director, Computational Science, Mathematics and Engineering Graduate Program<br>University of California, San Diego</p>
+    </header>
+
+    <div class="container">
+        
+        <section id="research">
+            <h2 class="section-title">Research Interests</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Computational Geometric Mechanics</h3>
+                    <p>Applying discrete differential geometry and discrete Lagrangian and Hamiltonian mechanics to the construction of geometric structure-preserving numerical algorithms.</p>
+                </div>
+                <div class="card">
+                    <h3>Computational Geometric Control Theory</h3>
+                    <p>Construction of real-time digital feedback control of mechanical systems using techniques from geometric control theory and computational geometric mechanics.</p>
+                </div>
+                <div class="card">
+                    <h3>Numerical Analysis</h3>
+                    <p>Derivation of accurate and efficient numerical schemes with good long-time geometric stability properties by combining geometric integration with adaptive, spectral, and multiscale techniques.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="honors">
+            <h2 class="section-title">Selected Honors & Education</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Recent Awards</h3>
+                    <ul class="styled-list">
+                        <li>Newton Award for Transformative Ideas, DoD (2020)</li>
+                        <li>Simons Fellowship in Mathematics</li>
+                        <li>Kavli Frontiers of Science Fellow, National Academy of Sciences</li>
+                        <li>NSF Faculty Early Career Development (CAREER) Award</li>
+                        <li>SciCADE New Talent Award</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Education</h3>
+                    <ul class="styled-list">
+                        <li><strong>Ph.D.</strong> Control and Dynamical Systems, Caltech (2004)</li>
+                        <li><strong>M.S.</strong> Mathematics, Caltech (2000)</li>
+                        <li><strong>B.S.</strong> Mathematics (with honors), Caltech (2000)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2 class="section-title">Contact Information</h2>
+            <div class="contact-info">
+                <div class="contact-block">
+                    <strong>Email</strong>
+                    <a href="mailto:mleok@ucsd.edu" style="color: var(--ucsd-gold); text-decoration: none;">mleok@ucsd.edu</a>
+                </div>
+                <div class="contact-block">
+                    <strong>Phone / Fax</strong>
+                    <p>Office: +1 (858) 534-2126</p>
+                    <p>Fax: +1 (858) 534-5273</p>
+                </div>
+                <div class="contact-block">
+                    <strong>Mailing Address</strong>
+                    <p>Department of Mathematics<br>
+                    University of California, San Diego<br>
+                    9500 Gilman Drive, Dept. 0112<br>
+                    La Jolla, CA 92093-0112, USA</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Melvin Leok. Designed for mleok.science.</p>
+    </footer>
+
+</body>
+</html>
