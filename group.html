@@ -338,6 +338,39 @@
             color: var(--ucsd-blue);
         }
 
+/* Lecture Button Styling */
+        .lecture-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background-color: transparent;
+            color: var(--ucsd-blue);
+            border: 1.5px solid var(--ucsd-blue);
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .lecture-btn:hover {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            box-shadow: 0 4px 8px rgba(24, 43, 73, 0.2);
+        }
+
+        .lecture-btn svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .lecture-btn:hover svg {
+            transform: scale(1.1);
+        }
+
         /* Footer */
         footer {
             background-color: var(--ucsd-blue);
