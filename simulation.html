@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Integrator Demo | mleok.science</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ucsd-blue: #182B49;
+            --ucsd-gold: #C69214;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #F7F9FC;
+            --white: #FFFFFF;
+            --euler-color: #ef4444; /* Red */
+            --rk4-color: #3b82f6;   /* Blue */
+            --symp-color: #10b981;  /* Green */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); line-height: 1.6; }
+
+        /* Navigation */
+        nav { background-color: var(--ucsd-blue); color: var(--white); padding: 0 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; min-height: 70px; }
+        nav h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        nav h1 a { color: var(--white); text-decoration: none; }
+        .nav-links { list-style: none; display: flex; align-items: center; gap: 5px; }
+        .nav-links li { position: relative; }
+        .nav-links a { color: var(--white); text-decoration: none; font-weight: 400; padding: 25px 15px; display: block; transition: all 0.3s; }
+        .nav-links a:hover { color: var(--ucsd-gold); background-color: rgba(255, 255, 255, 0.05); }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%); color: var(--white); padding: 40px 5%; text-align: center; }
+        .hero h2 { font-size: 2.2rem; margin-bottom: 10px; }
+        .hero p { opacity: 0.9; max-width: 800px; margin: 0 auto; }
+
+        /* Simulation Layout */
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 5%; display: grid; grid-template-columns: 250px 1fr; gap: 30px; }
+        
+        .controls { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; }
+        .controls h3 { margin-bottom: 15px; color: var(--ucsd-blue); border-bottom: 2px solid var(--ucsd-gold); padding-bottom: 5px; }
+        
+        .control-group { margin-bottom: 20px; }
+        .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+        input[type="range"] { width: 100%; margin-bottom: 5px; }
+        .slider-val { font-size: 0.85rem; color: var(--text-light); text-align: right; display: block; }
+
+        .toggle-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .legend-color { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+        .btn { display: block; width: 100%; padding: 10px; margin-bottom: 10px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-primary { background-color: var(--ucsd-blue); color: var(--white); }
+        .btn-primary:hover { background-color: #2A456C; }
+        .btn-secondary { background-color: #e2e8f0; color: var(--text-dark); }
+        .btn-secondary:hover { background-color: #cbd5e1; }
+
+        .sim-area { display: flex; flex-direction: column; gap: 20px; }
+        .canvas-container { background: var(--white); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px; text-align: center;}
+        canvas { border: 1px solid #e2e8f0; border-radius: 4px; max-width: 100%; }
+        .canvas-title { font-weight: 600; margin-bottom: 10px; color: var(--text-dark); }
+
+        footer { background-color: var(--ucsd-blue); color: var(--white); text-align: center; padding: 20px; font-size: 0.9rem; margin-top: 40px; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .nav-links { display: none; } /* Simplified for mobile view */
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1><a href="/">mleok.science</a></h1>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="group.html">Group</a></li>
+            <li><a href="teaching.html">Teaching</a></li>
+            <li><a href="simulation.html" style="color: var(--ucsd-gold);">Demo</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h2>Kepler Orbit: Geometric Integration</h2>
+        <p>This interactive demonstration highlights the difference between standard numerical methods and geometric integrators. Watch how explicit Euler rapidly gains energy, 4th order Runge-Kutta slowly drifts in energy, while symplectic Euler strictly bounds the energy error, preserving the orbit indefinitely.</p>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <h3>Simulation Controls</h3>
+            
+            <div class="control-group">
+                <label>Time Step (dt)</label>
+                <input type="range" id="dtSlider" min="0.001" max="0.05" step="0.001" value="0.015">
+                <span class="slider-val" id="dtDisplay">0.015</span>
+            </div>
+
+            <div class="control-group">
+                <label>Active Integrators</label>
+                <div class="toggle-group">
+                    <input type="checkbox" id="showEuler" checked>
+                    <span class="legend-color" style="background: var(--euler-color);"></span>
+                    <label for="showEuler" style="margin:0;">Explicit Euler</label>
+                </div>
+                <div class="toggle-group">
+                    <input type="checkbox" id="showRK4" checked>
+                    <span class="legend-color" style="background: var(--rk4-color);"></span>
+                    <label for="showRK4" style="margin:0;">4th order Runge-Kutta</label>
+                </div>
+                <div class="toggle-group">
+                    <input type="checkbox" id="showSymp" checked>
+                    <span class="legend-color" style="background: var(--symp-color);"></span>
+                    <label for="showSymp" style="margin:0;">Symplectic Euler</label>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="playBtn">Pause</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset Simulation</button>
+        </div>
+
+        <div class="sim-area">
+            <div class="canvas-container">
+                <div class="canvas-title">Orbital Trajectories (x vs y)</div>
+                <canvas id="orbitCanvas" width="800" height="400"></canvas>
+            </div>
+            
+            <div class="canvas-container">
+                <div class="canvas-title">Total Energy over Time (E = K + V)</div>
+                <canvas id="energyCanvas" width="800" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Melvin Leok. Designed for mleok.science.</p>
+    </footer>
+
+    <script>
+        // Physics & Math Setup (GM = 1)
+        const initCond = { x: 1.0, y: 0.0, vx: 0.0, vy: 0.8 };
+        const initialEnergy = 0.5 * (initCond.vx**2 + initCond.vy**2) - 1.0 / Math.sqrt(initCond.x**2 + initCond.y**2);
+        
+        let dt = parseFloat(document.getElementById('dtSlider').value);
+        let isPlaying = true;
+        let time = 0;
+
+        // State arrays for each integrator
+        let stateEuler = { ...initCond };
+        let stateRK4 = { ...initCond };
+        let stateSymp = { ...initCond };
+
+        // History for plotting
+        const maxHistory = 1000;
+        let histEuler = [], histRK4 = [], histSymp = [], histTime = [];
+
+        // UI Elements
+        const orbitCanvas = document.getElementById('orbitCanvas');
+        const orbitCtx = orbitCanvas.getContext('2d');
+        const energyCanvas = document.getElementById('energyCanvas');
+        const energyCtx = energyCanvas.getContext('2d');
+
+        // Acceleration function: a = -r_vec / |r|^3
+        function getAcc(x, y) {
+            let r3 = Math.pow(x*x + y*y, 1.5);
+            return { ax: -x/r3, ay: -y/r3 };
+        }
+
+        // Calculate Energy: E = 0.5*v^2 - 1/r
+        function calcEnergy(state) {
+            let r = Math.sqrt(state.x*state.x + state.y*state.y);
+            return 0.5 * (state.vx*state.vx + state.vy*state.vy) - 1.0/r;
+        }
+
+        function resetSim() {
+            stateEuler = { ...initCond };
+            stateRK4 = { ...initCond };
+            stateSymp = { ...initCond };
+            histEuler = []; histRK4 = []; histSymp = []; histTime = [];
+            time = 0;
+            orbitCtx.clearRect(0, 0, orbitCanvas.width, orbitCanvas.height);
+            energyCtx.clearRect(0, 0, energyCanvas.width, energyCanvas.height);
+        }
+
+        // Integration Steps
+        function stepEuler() {
+            let acc = getAcc(stateEuler.x, stateEuler.y);
+            let nextX = stateEuler.x + dt * stateEuler.vx;
+            let nextY = stateEuler.y + dt * stateEuler.vy;
+            let nextVx = stateEuler.vx + dt * acc.ax;
+            let nextVy = stateEuler.vy + dt * acc.ay;
+            stateEuler = { x: nextX, y: nextY, vx: nextVx, vy: nextVy };
+        }
+
+        function stepSymplectic() {
+            // Semi-implicit (Symplectic Euler): Update V first, then use new V to update X
+            let acc = getAcc(stateSymp.x, stateSymp.y);
+            stateSymp.vx += dt * acc.ax;
+            stateSymp.vy += dt * acc.ay;
+            stateSymp.x += dt * stateSymp.vx;
+            stateSymp.y += dt * stateSymp.vy;
+        }
+
+        function stepRK4() {
+            let s = stateRK4;
+            let k1v = getAcc(s.x, s.y);
+            let k1x = { vx: s.vx, vy: s.vy };
+
+            let k2v = getAcc(s.x + 0.5*dt*k1x.vx, s.y + 0.5*dt*k1x.vy);
+            let k2x = { vx: s.vx + 0.5*dt*k1v.ax, vy: s.vy + 0.5*dt*k1v.ay };
+
+            let k3v = getAcc(s.x + 0.5*dt*k2x.vx, s.y + 0.5*dt*k2x.vy);
+            let k3x = { vx: s.vx + 0.5*dt*k2v.ax, vy: s.vy + 0.5*dt*k2v.ay };
+
+            let k4v = getAcc(s.x + dt*k3x.vx, s.y + dt*k3x.vy);
+            let k4x = { vx: s.vx + dt*k3v.ax, vy: s.vy + dt*k3v.ay };
+
+            stateRK4.x += (dt/6) * (k1x.vx + 2*k2x.vx + 2*k3x.vx + k4x.vx);
+            stateRK4.y += (dt/6) * (k1x.vy + 2*k2x.vy + 2*k3x.vy + k4x.vy);
+            stateRK4.vx += (dt/6) * (k1v.ax + 2*k2v.ax + 2*k3v.ax + k4v.ax);
+            stateRK4.vy += (dt/6) * (k1v.ay + 2*k2v.ay + 2*k3v.ay + k4v.ay);
+        }
+
+        // Rendering Functions
+        function drawOrbit() {
+            const w = orbitCanvas.width; const h = orbitCanvas.height;
+            const scale = 150; // pixels per unit
+            const cx = w/2; const cy = h/2;
+
+            orbitCtx.clearRect(0, 0, w, h);
+            
+            // Draw central mass
+            orbitCtx.fillStyle = '#C69214'; // Gold star
+            orbitCtx.beginPath();
+            orbitCtx.arc(cx, cy, 8, 0, Math.PI*2);
+            orbitCtx.fill();
+
+            // Helper to draw trail
+            function drawTrail(hist, color) {
+                if(hist.length < 2) return;
+                orbitCtx.strokeStyle = color;
+                orbitCtx.lineWidth = 2;
+                orbitCtx.beginPath();
+                orbitCtx.moveTo(cx + hist[0].x * scale, cy - hist[0].y * scale);
+                for(let i=1; i<hist.length; i++) {
+                    orbitCtx.lineTo(cx + hist[i].x * scale, cy - hist[i].y * scale);
+                }
+                orbitCtx.stroke();
+                
+                // Draw current position particle
+                let last = hist[hist.length-1];
+                orbitCtx.fillStyle = color;
+                orbitCtx.beginPath();
+                orbitCtx.arc(cx + last.x * scale, cy - last.y * scale, 5, 0, Math.PI*2);
+                orbitCtx.fill();
+            }
+
+            if(document.getElementById('showEuler').checked) drawTrail(histEuler, '#ef4444');
+            if(document.getElementById('showRK4').checked) drawTrail(histRK4, '#3b82f6');
+            if(document.getElementById('showSymp').checked) drawTrail(histSymp, '#10b981');
+        }
+
+        function drawEnergy() {
+            const w = energyCanvas.width; const h = energyCanvas.height;
+            energyCtx.clearRect(0, 0, w, h);
+            
+            if(histTime.length < 2) return;
+
+            // Map data to canvas
+            const eMin = -0.7; const eMax = -0.3; // Energy bounds for plotting
+            const trueEnergy = initialEnergy;
+            
+            // Draw true energy reference line
+            const yTrue = h - ((trueEnergy - eMin) / (eMax - eMin)) * h;
+            energyCtx.strokeStyle = '#cbd5e1';
+            energyCtx.setLineDash([5, 5]);
+            energyCtx.beginPath();
+            energyCtx.moveTo(0, yTrue);
+            energyCtx.lineTo(w, yTrue);
+            energyCtx.stroke();
+            energyCtx.setLineDash([]);
+
+            function drawLine(hist, color) {
+                energyCtx.strokeStyle = color;
+                energyCtx.lineWidth = 2;
+                energyCtx.beginPath();
+                for(let i=0; i<hist.length; i++) {
+                    let px = (i / maxHistory) * w;
+                    let py = h - ((hist[i].e - eMin) / (eMax - eMin)) * h;
+                    if(i===0) energyCtx.moveTo(px, py);
+                    else energyCtx.lineTo(px, py);
+                }
+                energyCtx.stroke();
+            }
+
+            if(document.getElementById('showEuler').checked) drawLine(histEuler, '#ef4444');
+            if(document.getElementById('showRK4').checked) drawLine(histRK4, '#3b82f6');
+            if(document.getElementById('showSymp').checked) drawLine(histSymp, '#10b981');
+        }
+
+        // Main Loop
+        function loop() {
+            if(isPlaying) {
+                // Do a few physics steps per frame so it doesn't run too slowly
+                for(let i=0; i<3; i++) {
+                    stepEuler();
+                    stepRK4();
+                    stepSymplectic();
+                    time += dt;
+                }
+
+                // Record history
+                histEuler.push({x: stateEuler.x, y: stateEuler.y, e: calcEnergy(stateEuler)});
+                histRK4.push({x: stateRK4.x, y: stateRK4.y, e: calcEnergy(stateRK4)});
+                histSymp.push({x: stateSymp.x, y: stateSymp.y, e: calcEnergy(stateSymp)});
+                histTime.push(time);
+
+                if(histEuler.length > maxHistory) {
+                    histEuler.shift(); histRK4.shift(); histSymp.shift(); histTime.shift();
+                }
+
+                drawOrbit();
+                drawEnergy();
+            }
+            requestAnimationFrame(loop);
+        }
+
+        // Event Listeners
+        document.getElementById('playBtn').addEventListener('click', (e) => {
+            isPlaying = !isPlaying;
+            e.target.innerText = isPlaying ? "Pause" : "Play";
+            e.target.className = isPlaying ? "btn btn-primary" : "btn btn-secondary";
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', resetSim);
+        
+        document.getElementById('dtSlider').addEventListener('input', (e) => {
+            dt = parseFloat(e.target.value);
+            document.getElementById('dtDisplay').innerText = dt.toFixed(3);
+        });
+
+        document.getElementById('showEuler').addEventListener('change', drawOrbit);
+        document.getElementById('showRK4').addEventListener('change', drawOrbit);
+        document.getElementById('showSymp').addEventListener('change', drawOrbit);
+
+        // Start
+        loop();
+    </script>
+</body>
+</html>

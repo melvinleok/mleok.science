@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robotic Arm Control | mleok.science</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ucsd-blue: #182B49;
+            --ucsd-gold: #C69214;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #F7F9FC;
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); line-height: 1.6; }
+
+        /* Navigation */
+        nav { background-color: var(--ucsd-blue); color: var(--white); padding: 0 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; min-height: 70px; }
+        nav h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        nav h1 a { color: var(--white); text-decoration: none; }
+        .nav-links { list-style: none; display: flex; align-items: center; gap: 5px; }
+        .nav-links li { position: relative; }
+        .nav-links a { color: var(--white); text-decoration: none; font-weight: 400; padding: 25px 15px; display: block; transition: all 0.3s; }
+        .nav-links a:hover { color: var(--ucsd-gold); background-color: rgba(255, 255, 255, 0.05); }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%); color: var(--white); padding: 40px 5%; text-align: center; }
+        .hero h2 { font-size: 2.2rem; margin-bottom: 10px; }
+        .hero p { opacity: 0.9; max-width: 800px; margin: 0 auto; }
+
+        /* Simulation Layout */
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 5%; display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+        
+        .controls { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; }
+        .controls h3 { margin-bottom: 15px; color: var(--ucsd-blue); border-bottom: 2px solid var(--ucsd-gold); padding-bottom: 5px; }
+        
+        .control-group { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; color: var(--ucsd-blue); }
+        .control-group p { font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px; line-height: 1.4; }
+        
+        input[type="range"] { width: 100%; margin-bottom: 5px; cursor: pointer; }
+        .slider-val { font-size: 0.85rem; font-weight: 600; color: var(--ucsd-gold); text-align: right; display: block; }
+
+        .radio-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .radio-item { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; cursor: pointer; }
+
+        .sim-area { display: flex; flex-direction: column; gap: 20px; }
+        .canvas-container { background: var(--white); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px; text-align: center; position: relative;}
+        canvas { border: 1px solid #e2e8f0; border-radius: 4px; max-width: 100%; background: #f8fafc; cursor: crosshair; touch-action: none; }
+        .canvas-title { font-weight: 600; margin-bottom: 5px; color: var(--text-dark); font-size: 1.2rem; }
+        .canvas-subtitle { font-size: 0.9rem; color: var(--text-light); margin-bottom: 15px; }
+
+        .telemetry { display: flex; justify-content: space-around; background: #f1f5f9; padding: 10px; border-radius: 6px; margin-top: 15px; font-family: monospace; font-size: 0.9rem; }
+
+        footer { background-color: var(--ucsd-blue); color: var(--white); text-align: center; padding: 20px; font-size: 0.9rem; margin-top: 40px; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1><a href="/">mleok.science</a></h1>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="group.html">Group</a></li>
+            <li><a href="teaching.html">Teaching</a></li>
+            <li><a href="simulation.html">Demo 1</a></li>
+            <li><a href="variational-demo.html">Demo 2</a></li>
+            <li><a href="robotic-arm.html" style="color: var(--ucsd-gold);">Demo 3</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h2>Geometric Control: Robotic Kinematics</h2>
+        <p>Explore the mathematics of control theory. <strong>Forward Kinematics</strong> calculates the end-effector position given the joint angles. <strong>Inverse Kinematics</strong> solves the much harder geometric problem: determining the required joint angles to reach a specific target coordinate.</p>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <h3>Control Mode</h3>
+            
+            <div class="control-group">
+                <div class="radio-group">
+                    <label class="radio-item">
+                        <input type="radio" name="mode" value="fk" checked>
+                        <strong>Forward Kinematics (Manual)</strong>
+                    </label>
+                    <p>Adjust the joint angles directly using the sliders below.</p>
+                    
+                    <label class="radio-item" style="margin-top: 10px;">
+                        <input type="radio" name="mode" value="ik">
+                        <strong>Inverse Kinematics (Target)</strong>
+                    </label>
+                    <p>Move your mouse over the canvas. The system mathematically solves for the angles required to reach the target.</p>
+                </div>
+            </div>
+
+            <div id="fk-controls" class="control-group">
+                <label>Shoulder Joint (&theta;&#8321;)</label>
+                <input type="range" id="theta1" min="-180" max="180" step="1" value="45">
+                <span class="slider-val" id="val1">45&deg;</span>
+
+                <label style="margin-top: 20px;">Elbow Joint (&theta;&#8322;)</label>
+                <input type="range" id="theta2" min="-160" max="160" step="1" value="-90">
+                <span class="slider-val" id="val2">-90&deg;</span>
+            </div>
+        </div>
+
+        <div class="sim-area">
+            <div class="canvas-container">
+                <div class="canvas-title">2-DOF Robotic Arm</div>
+                <div class="canvas-subtitle" id="instruction">Use the sliders on the left to manually control the arm.</div>
+                
+                <canvas id="armCanvas" width="800" height="500"></canvas>
+                
+                <div class="telemetry">
+                    <div><strong>Target (X, Y):</strong> <span id="out-target">N/A</span></div>
+                    <div><strong>End Effector (X, Y):</strong> <span id="out-ee">0.0, 0.0</span></div>
+                    <div><strong>&theta;&#8321;:</strong> <span id="out-t1">0&deg;</span></div>
+                    <div><strong>&theta;&#8322;:</strong> <span id="out-t2">0&deg;</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Melvin Leok. Designed for mleok.science.</p>
+    </footer>
+
+    <script>
+        // Setup Canvas and Context
+        const canvas = document.getElementById('armCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Arm Properties
+        const L1 = 180; // Length of upper arm
+        const L2 = 140; // Length of forearm
+        const originX = canvas.width / 2;
+        const originY = canvas.height - 80; // Base position
+        
+        // State Variables
+        let mode = 'fk'; // 'fk' or 'ik'
+        let theta1 = 45 * Math.PI / 180;
+        let theta2 = -90 * Math.PI / 180;
+        let targetX = originX;
+        let targetY = originY - L1 - L2;
+        let mouseIsOver = false;
+
+        // UI Elements
+        const slider1 = document.getElementById('theta1');
+        const slider2 = document.getElementById('theta2');
+        const val1 = document.getElementById('val1');
+        const val2 = document.getElementById('val2');
+        const radios = document.getElementsByName('mode');
+        const instruction = document.getElementById('instruction');
+
+        // Telemetry Elements
+        const outTarget = document.getElementById('out-target');
+        const outEE = document.getElementById('out-ee');
+        const outT1 = document.getElementById('out-t1');
+        const outT2 = document.getElementById('out-t2');
+
+        // Mode Switching
+        radios.forEach(r => {
+            r.addEventListener('change', (e) => {
+                mode = e.target.value;
+                if(mode === 'fk') {
+                    slider1.disabled = false;
+                    slider2.disabled = false;
+                    slider1.style.opacity = 1;
+                    slider2.style.opacity = 1;
+                    instruction.innerText = "Use the sliders on the left to manually control the arm.";
+                    outTarget.innerText = "N/A";
+                } else {
+                    slider1.disabled = true;
+                    slider2.disabled = true;
+                    slider1.style.opacity = 0.5;
+                    slider2.style.opacity = 0.5;
+                    instruction.innerText = "Move your mouse over the canvas to set a target for the arm.";
+                }
+                draw();
+            });
+        });
+
+        // Forward Kinematics (Sliders)
+        function updateFKFromSliders() {
+            if(mode !== 'fk') return;
+            theta1 = -slider1.value * Math.PI / 180; // Negative because Canvas Y is inverted
+            theta2 = -slider2.value * Math.PI / 180;
+            val1.innerText = slider1.value + '°';
+            val2.innerText = slider2.value + '°';
+            draw();
+        }
+
+        slider1.addEventListener('input', updateFKFromSliders);
+        slider2.addEventListener('input', updateFKFromSliders);
+
+        // Inverse Kinematics (Math: Analytical Law of Cosines)
+        function solveIK(tx, ty) {
+            // Convert to coordinates relative to base
+            let x = tx - originX;
+            let y = ty - originY; 
+
+            let distSq = x*x + y*y;
+            let dist = Math.sqrt(distSq);
+
+            // If target is out of reach, point towards it
+            if (dist > L1 + L2) {
+                x = x * (L1 + L2 - 0.1) / dist;
+                y = y * (L1 + L2 - 0.1) / dist;
+                distSq = x*x + y*y;
+            }
+
+            // Law of Cosines for Elbow Angle (theta2)
+            let cosT2 = (distSq - L1*L1 - L2*L2) / (2 * L1 * L2);
+            // Clamp to avoid floating point errors
+            cosT2 = Math.max(-1, Math.min(1, cosT2)); 
+            
+            // We use the negative root to keep the elbow "up" usually, 
+            // but you can toggle the sign to flip the arm configuration
+            theta2 = -Math.acos(cosT2); 
+
+            // Calculate Shoulder Angle (theta1)
+            let k1 = L1 + L2 * Math.cos(theta2);
+            let k2 = L2 * Math.sin(theta2);
+            theta1 = Math.atan2(y, x) - Math.atan2(k2, k1);
+
+            // Update sliders visually to match the new IK angles
+            let deg1 = Math.round(-theta1 * 180 / Math.PI);
+            let deg2 = Math.round(-theta2 * 180 / Math.PI);
+            slider1.value = deg1;
+            slider2.value = deg2;
+            val1.innerText = deg1 + '°';
+            val2.innerText = deg2 + '°';
+        }
+
+        // Mouse Tracking
+        canvas.addEventListener('mousemove', (e) => {
+            if(mode !== 'ik') return;
+            const rect = canvas.getBoundingClientRect();
+            targetX = e.clientX - rect.left;
+            targetY = e.clientY - rect.top;
+            solveIK(targetX, targetY);
+            draw();
+        });
+
+        canvas.addEventListener('mouseenter', () => { mouseIsOver = true; if(mode === 'ik') draw(); });
+        canvas.addEventListener('mouseleave', () => { mouseIsOver = false; if(mode === 'ik') draw(); });
+
+        // Touch support for mobile IK
+        canvas.addEventListener('touchmove', (e) => {
+            if(mode !== 'ik') return;
+            e.preventDefault(); // Prevent scrolling while dragging arm
+            const rect = canvas.getBoundingClientRect();
+            targetX = e.touches[0].clientX - rect.left;
+            targetY = e.touches[0].clientY - rect.top;
+            mouseIsOver = true;
+            solveIK(targetX, targetY);
+            draw();
+        }, {passive: false});
+
+        // Main Rendering Function
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Calculate joint positions using Forward Kinematics
+            let joint1X = originX + L1 * Math.cos(theta1);
+            let joint1Y = originY + L1 * Math.sin(theta1);
+            
+            let endX = joint1X + L2 * Math.cos(theta1 + theta2);
+            let endY = joint1Y + L2 * Math.sin(theta1 + theta2);
+
+            // 1. Draw Target (if in IK mode)
+            if (mode === 'ik' && mouseIsOver) {
+                ctx.beginPath();
+                ctx.arc(targetX, targetY, 8, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.5)'; // Red transparent
+                ctx.fill();
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Crosshair
+                ctx.beginPath();
+                ctx.moveTo(targetX - 15, targetY); ctx.lineTo(targetX + 15, targetY);
+                ctx.moveTo(targetX, targetY - 15); ctx.lineTo(targetX, targetY + 15);
+                ctx.stroke();
+                
+                outTarget.innerText = `${Math.round(targetX - originX)}, ${Math.round(originY - targetY)}`;
+            }
+
+            // 2. Draw Base Platform
+            ctx.fillStyle = 'var(--text-dark)';
+            ctx.beginPath();
+            ctx.roundRect(originX - 40, originY, 80, 20, 5);
+            ctx.fill();
+
+            // 3. Draw Links (Segments)
+            ctx.lineWidth = 16;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Link 1
+            ctx.strokeStyle = 'var(--ucsd-blue)';
+            ctx.beginPath();
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(joint1X, joint1Y);
+            ctx.stroke();
+
+            // Link 2
+            ctx.strokeStyle = 'var(--ucsd-gold)';
+            ctx.beginPath();
+            ctx.moveTo(joint1X, joint1Y);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+
+            // 4. Draw Joints (Circles)
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#ffffff';
+
+            // Base Joint
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath(); ctx.arc(originX, originY, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+            // Elbow Joint
+            ctx.fillStyle = '#64748b';
+            ctx.beginPath(); ctx.arc(joint1X, joint1Y, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+            // End Effector (Hand/Tool)
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath(); ctx.arc(endX, endY, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+            // 5. Update Telemetry text
+            outEE.innerText = `${Math.round(endX - originX)}, ${Math.round(originY - endY)}`;
+            outT1.innerText = Math.round(-theta1 * 180 / Math.PI) + '°';
+            outT2.innerText = Math.round(-theta2 * 180 / Math.PI) + '°';
+        }
+
+        // Initialize First Draw
+        updateFKFromSliders();
+
+    </script>
+</body>
+</html>

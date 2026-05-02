@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaotic Double Pendulum | mleok.science</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ucsd-blue: #182B49;
+            --ucsd-gold: #C69214;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #F7F9FC;
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); line-height: 1.6; }
+
+        /* Navigation */
+        nav { background-color: var(--ucsd-blue); color: var(--white); padding: 0 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; min-height: 70px; }
+        nav h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        nav h1 a { color: var(--white); text-decoration: none; }
+        .nav-links { list-style: none; display: flex; align-items: center; gap: 5px; }
+        .nav-links li { position: relative; }
+        .nav-links a { color: var(--white); text-decoration: none; font-weight: 400; padding: 25px 15px; display: block; transition: all 0.3s; }
+        .nav-links a:hover { color: var(--ucsd-gold); background-color: rgba(255, 255, 255, 0.05); }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%); color: var(--white); padding: 40px 5%; text-align: center; }
+        .hero h2 { font-size: 2.2rem; margin-bottom: 10px; }
+        .hero p { opacity: 0.9; max-width: 800px; margin: 0 auto; }
+
+        /* Simulation Layout */
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 5%; display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+        
+        .controls { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; }
+        .controls h3 { margin-bottom: 15px; color: var(--ucsd-blue); border-bottom: 2px solid var(--ucsd-gold); padding-bottom: 5px; }
+        
+        .control-group { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; color: var(--ucsd-blue); }
+        .control-group p { font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px; line-height: 1.4; }
+        
+        input[type="range"] { width: 100%; margin-bottom: 5px; cursor: pointer; }
+        .slider-val { font-size: 0.85rem; font-weight: 600; color: var(--ucsd-gold); text-align: right; display: block; }
+        
+        select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; font-size: 0.95rem; margin-bottom: 10px; }
+
+        .btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-primary { background-color: var(--ucsd-blue); color: var(--white); }
+        .btn-primary:hover { background-color: #2A456C; }
+        .btn-secondary { background-color: #e2e8f0; color: var(--text-dark); }
+        .btn-secondary:hover { background-color: #cbd5e1; }
+
+        .sim-area { display: flex; flex-direction: column; gap: 20px; }
+        .canvas-container { background: var(--white); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px; text-align: center;}
+        canvas { border: 1px solid #e2e8f0; border-radius: 4px; max-width: 100%; }
+        #simCanvas { background: #0f172a; }
+        #energyCanvas { background: #fafafa; margin-top: 10px; }
+        .canvas-title { font-weight: 600; margin-bottom: 5px; color: var(--text-dark); font-size: 1.2rem; }
+        .canvas-subtitle { font-size: 0.9rem; color: var(--text-light); margin-bottom: 15px; }
+
+        .telemetry { display: flex; justify-content: space-around; background: #f1f5f9; padding: 15px; border-radius: 6px; margin-top: 15px; font-family: monospace; font-size: 1rem; }
+        .warning { color: #ef4444; font-weight: bold; display: none; }
+
+        footer { background-color: var(--ucsd-blue); color: var(--white); text-align: center; padding: 20px; font-size: 0.9rem; margin-top: 40px; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1><a href="/">mleok.science</a></h1>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="group.html">Group</a></li>
+            <li><a href="teaching.html">Teaching</a></li>
+            <li><a href="chaotic-pendulum.html" style="color: var(--ucsd-gold);">Demo: Chaos</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h2>Chaotic Dynamics & Geometric Integration</h2>
+        <p>Notice how explicit midpoint drifts away from the initial energy over time. The implicit midpoint method utilizes a nonlinear solver at each step to strictly preserve the symplectic structure, bounding the energy error completely regardless of the duration.</p>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <h3>Simulation Parameters</h3>
+            
+            <div class="control-group">
+                <label>Numerical Integrator</label>
+                <select id="integratorSelect">
+                    <option value="implicit" selected>Implicit Midpoint (Symplectic)</option>
+                    <option value="rk2">Explicit Midpoint (Standard)</option>
+                </select>
+                <p id="integratorDesc">A geometric (symplectic) integrator. It uses a Newton-Raphson nonlinear solver at every step to find the implicit solution, exhibiting bounded energy error for non-separable Hamiltonians.</p>
+            </div>
+
+            <div class="control-group">
+                <label>Initial Angle &theta;&#8321; (Upper)</label>
+                <input type="range" id="sliderT1" min="-180" max="180" step="1" value="120">
+                <span class="slider-val" id="valT1">120&deg;</span>
+
+                <label style="margin-top: 15px;">Initial Angle &theta;&#8322; (Lower)</label>
+                <input type="range" id="sliderT2" min="-180" max="180" step="1" value="45">
+                <span class="slider-val" id="valT2">45&deg;</span>
+            </div>
+
+            <button class="btn btn-primary" id="playBtn">Pause</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset & Apply Angles</button>
+        </div>
+
+        <div class="sim-area">
+            <div class="canvas-container">
+                <div class="canvas-title">Double Pendulum Trace</div>
+                <div class="canvas-subtitle">Tracing the path of the lower mass.</div>
+                <canvas id="simCanvas" width="800" height="400"></canvas>
+                
+                <div class="telemetry">
+                    <div><strong>Total System Energy:</strong> <span id="out-energy">0.00</span> J</div>
+                    <div id="energyWarning" class="warning">ENERGY DRIFT DETECTED!</div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <div class="canvas-title">Energy Evolution</div>
+                <div class="canvas-subtitle">The Y-axis is tightly bounded (±2.5% deviation) to highlight the slow drift of non-geometric methods.</div>
+                <canvas id="energyCanvas" width="800" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Melvin Leok</p>
+    </footer>
+
+    <script>
+        // Canvas Setup
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const originX = canvas.width / 2;
+        const originY = canvas.height / 3;
+
+        const energyCanvas = document.getElementById('energyCanvas');
+        const energyCtx = energyCanvas.getContext('2d');
+
+        // Physics Constants
+        const g = 9.81;
+        const L1 = 90; // Length 1
+        const L2 = 90; // Length 2
+        const m1 = 10; // Mass 1
+        const m2 = 10; // Mass 2
+        
+        // ** TWEAKED FOR VISIBILITY: Larger dt, fewer substeps = more error for RK2 **
+        const dt = 0.08; 
+        const substeps = 2; 
+
+        // State Variables
+        let state = { th1: 0, th2: 0, w1: 0, w2: 0 };
+        let isPlaying = true;
+        let integrator = 'implicit';
+        let initialEnergy = 0;
+        
+        // Histories
+        const maxHistory = 300;
+        let trail = [];
+        let energyHistory = [];
+
+        // UI Elements
+        const sliderT1 = document.getElementById('sliderT1');
+        const sliderT2 = document.getElementById('sliderT2');
+        const valT1 = document.getElementById('valT1');
+        const valT2 = document.getElementById('valT2');
+        const integratorSelect = document.getElementById('integratorSelect');
+        const integratorDesc = document.getElementById('integratorDesc');
+        const outEnergy = document.getElementById('out-energy');
+        const energyWarning = document.getElementById('energyWarning');
+        const playBtn = document.getElementById('playBtn');
+
+        // Descriptions
+        const descriptions = {
+            'implicit': "A geometric (symplectic) integrator. It uses a Newton-Raphson nonlinear solver at every step to find the implicit solution, exhibiting bounded energy error for non-separable Hamiltonians.",
+            'rk2': "A standard 2nd-order method (explicit midpoint). While more accurate than explicit Euler, it ignores the geometric invariants. Watch the chart to see it gradually drift from the true energy baseline."
+        };
+
+        // UI Listeners
+        sliderT1.addEventListener('input', (e) => valT1.innerText = e.target.value + '°');
+        sliderT2.addEventListener('input', (e) => valT2.innerText = e.target.value + '°');
+        
+        integratorSelect.addEventListener('change', (e) => {
+            integrator = e.target.value;
+            integratorDesc.innerText = descriptions[integrator];
+            resetSim(); // Reset on change for fair comparison
+        });
+
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playBtn.innerText = isPlaying ? "Pause" : "Play";
+            playBtn.className = isPlaying ? "btn btn-primary" : "btn btn-secondary";
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', resetSim);
+
+        // Core Physics Equations (Angular Accelerations)
+        function getDerivatives(th1, th2, w1, w2) {
+            let num1 = -g * (2 * m1 + m2) * Math.sin(th1);
+            let num2 = -m2 * g * Math.sin(th1 - 2 * th2);
+            let num3 = -2 * Math.sin(th1 - th2) * m2;
+            let num4 = w2 * w2 * L2 + w1 * w1 * L1 * Math.cos(th1 - th2);
+            let den = L1 * (2 * m1 + m2 - m2 * Math.cos(2 * th1 - 2 * th2));
+            let a1 = (num1 + num2 + num3 * num4) / den;
+
+            let num5 = 2 * Math.sin(th1 - th2);
+            let num6 = (w1 * w1 * L1 * (m1 + m2));
+            let num7 = g * (m1 + m2) * Math.cos(th1);
+            let num8 = w2 * w2 * L2 * m2 * Math.cos(th1 - th2);
+            let den2 = L2 * (2 * m1 + m2 - m2 * Math.cos(2 * th1 - 2 * th2));
+            let a2 = (num5 * (num6 + num7 + num8)) / den2;
+
+            return [w1, w2, a1, a2];
+        }
+
+        // Calculate Total System Energy (T + V)
+        function calcEnergy() {
+            let v1 = L1 * L1 * state.w1 * state.w1;
+            let v2 = L2 * L2 * state.w2 * state.w2;
+            let v12 = 2 * L1 * L2 * state.w1 * state.w2 * Math.cos(state.th1 - state.th2);
+            let T = 0.5 * m1 * v1 + 0.5 * m2 * (v1 + v2 + v12);
+            let V = -(m1 + m2) * g * L1 * Math.cos(state.th1) - m2 * g * L2 * Math.cos(state.th2);
+            return T + V;
+        }
+
+        // Gaussian Elimination Matrix Solver for the Nonlinear Solver
+        function solveLinearSystem(A, b) {
+            let n = 4;
+            let x = [0,0,0,0];
+            let m = [[...A[0]], [...A[1]], [...A[2]], [...A[3]]];
+            let v = [...b];
+
+            for (let i = 0; i < n; i++) {
+                let maxEl = Math.abs(m[i][i]), maxRow = i;
+                for (let k = i + 1; k < n; k++) {
+                    if (Math.abs(m[k][i]) > maxEl) { maxEl = Math.abs(m[k][i]); maxRow = k; }
+                }
+                
+                let tmp = m[maxRow]; m[maxRow] = m[i]; m[i] = tmp;
+                let tmpV = v[maxRow]; v[maxRow] = v[i]; v[i] = tmpV;
+
+                if (Math.abs(m[i][i]) < 1e-12) return [0,0,0,0];
+
+                for (let k = i + 1; k < n; k++) {
+                    let c = -m[k][i] / m[i][i];
+                    for (let j = i; j < n; j++) {
+                        if (i === j) m[k][j] = 0;
+                        else m[k][j] += c * m[i][j];
+                    }
+                    v[k] += c * v[i];
+                }
+            }
+
+            for (let i = n - 1; i >= 0; i--) {
+                x[i] = v[i] / m[i][i];
+                for (let k = i - 1; k >= 0; k--) {
+                    v[k] -= m[k][i] * x[i];
+                }
+            }
+            return x;
+        }
+
+        // --- INTEGRATOR ALGORITHMS ---
+
+        function stepImplicitMidpoint() {
+            let zn = [state.th1, state.th2, state.w1, state.w2];
+            let znext = [...zn]; 
+            
+            let maxIters = 10;
+            let epsilon = 1e-6; 
+            let tol = 1e-6;
+
+            for (let iter = 0; iter < maxIters; iter++) {
+                let zmid = [
+                    (zn[0] + znext[0])/2, (zn[1] + znext[1])/2,
+                    (zn[2] + znext[2])/2, (zn[3] + znext[3])/2
+                ];
+                let fmid = getDerivatives(zmid[0], zmid[1], zmid[2], zmid[3]);
+                
+                let F = [
+                    znext[0] - zn[0] - dt * fmid[0],
+                    znext[1] - zn[1] - dt * fmid[1],
+                    znext[2] - zn[2] - dt * fmid[2],
+                    znext[3] - zn[3] - dt * fmid[3]
+                ];
+
+                let maxErr = Math.max(Math.abs(F[0]), Math.abs(F[1]), Math.abs(F[2]), Math.abs(F[3]));
+                if (maxErr < tol) break;
+
+                let J = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]];
+                for (let j = 0; j < 4; j++) {
+                    let znext_eps = [...znext];
+                    znext_eps[j] += epsilon;
+                    
+                    let zmid_eps = [
+                        (zn[0] + znext_eps[0])/2, (zn[1] + znext_eps[1])/2,
+                        (zn[2] + znext_eps[2])/2, (zn[3] + znext_eps[3])/2
+                    ];
+                    let fmid_eps = getDerivatives(zmid_eps[0], zmid_eps[1], zmid_eps[2], zmid_eps[3]);
+                    
+                    let F_eps = [
+                        znext_eps[0] - zn[0] - dt * fmid_eps[0],
+                        znext_eps[1] - zn[1] - dt * fmid_eps[1],
+                        znext_eps[2] - zn[2] - dt * fmid_eps[2],
+                        znext_eps[3] - zn[3] - dt * fmid_eps[3]
+                    ];
+                    
+                    for (let i = 0; i < 4; i++) {
+                        J[i][j] = (F_eps[i] - F[i]) / epsilon;
+                    }
+                }
+
+                let minusF = [-F[0], -F[1], -F[2], -F[3]];
+                let delta = solveLinearSystem(J, minusF);
+
+                znext[0] += delta[0];
+                znext[1] += delta[1];
+                znext[2] += delta[2];
+                znext[3] += delta[3];
+            }
+
+            state = { th1: znext[0], th2: znext[1], w1: znext[2], w2: znext[3] };
+        }
+
+        function stepRK2() {
+            let s = { ...state };
+            
+            // k1 = f(t, y)
+            let f1 = getDerivatives(s.th1, s.th2, s.w1, s.w2);
+            let k1 = { th1: s.w1, th2: s.w2, w1: f1[2], w2: f1[3] };
+
+            // k2 = f(t + dt/2, y + dt/2 * k1)
+            let s2 = { 
+                th1: s.th1 + 0.5 * dt * k1.th1, 
+                th2: s.th2 + 0.5 * dt * k1.th2, 
+                w1: s.w1 + 0.5 * dt * k1.w1, 
+                w2: s.w2 + 0.5 * dt * k1.w2 
+            };
+            let f2 = getDerivatives(s2.th1, s2.th2, s2.w1, s2.w2);
+            let k2 = { th1: s2.w1, th2: s2.w2, w1: f2[2], w2: f2[3] };
+
+            // y_next = y + dt * k2
+            state.th1 += dt * k2.th1;
+            state.th2 += dt * k2.th2;
+            state.w1 += dt * k2.w1;
+            state.w2 += dt * k2.w2;
+        }
+
+        // System Control
+        function resetSim() {
+            state.th1 = parseFloat(sliderT1.value) * Math.PI / 180;
+            state.th2 = parseFloat(sliderT2.value) * Math.PI / 180;
+            state.w1 = 0;
+            state.w2 = 0;
+            trail = [];
+            energyHistory = [];
+            initialEnergy = calcEnergy();
+            energyWarning.style.display = 'none';
+            outEnergy.style.color = 'var(--text-dark)';
+            draw(); 
+            drawEnergyPlot();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Kinematics
+            let x1 = originX + L1 * Math.sin(state.th1);
+            let y1 = originY + L1 * Math.cos(state.th1);
+            let x2 = x1 + L2 * Math.sin(state.th2);
+            let y2 = y1 + L2 * Math.cos(state.th2);
+
+            let currentEnergy = calcEnergy();
+
+            if (isPlaying) {
+                trail.push({ x: x2, y: y2 });
+                if (trail.length > maxHistory) trail.shift();
+                
+                energyHistory.push(currentEnergy);
+                if (energyHistory.length > maxHistory) energyHistory.shift();
+            }
+
+            if (trail.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(trail[0].x, trail[0].y);
+                for (let i = 1; i < trail.length; i++) {
+                    ctx.lineTo(trail[i].x, trail[i].y);
+                }
+                ctx.strokeStyle = 'rgba(198, 146, 20, 0.6)'; 
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = '#94a3b8'; 
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(originX, originY, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(x1, y1, 10, 0, Math.PI * 2);
+            ctx.fillStyle = 'var(--ucsd-blue)';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(x2, y2, 10, 0, Math.PI * 2);
+            ctx.fillStyle = 'var(--ucsd-gold)';
+            ctx.fill();
+
+            outEnergy.innerText = currentEnergy.toFixed(2);
+            
+            // Highlight drift if it moves > 2.5% away from initial energy
+            if (Math.abs(currentEnergy - initialEnergy) > Math.abs(initialEnergy) * 0.025) {
+                outEnergy.style.color = '#ef4444'; 
+                energyWarning.style.display = 'block';
+            } else {
+                outEnergy.style.color = 'var(--text-dark)';
+                energyWarning.style.display = 'none';
+            }
+        }
+
+        function drawEnergyPlot() {
+            const w = energyCanvas.width; 
+            const h = energyCanvas.height;
+            energyCtx.clearRect(0, 0, w, h);
+            
+            if (energyHistory.length < 2) return;
+
+            // ** TWEAKED FOR VISIBILITY: Zoomed way in on the Y-Axis (±2.5% deviation) **
+            const energyRange = Math.abs(initialEnergy) * 0.025; 
+            const eMax = initialEnergy + energyRange;
+            const eMin = initialEnergy - energyRange;
+            
+            const yTrue = h - ((initialEnergy - eMin) / (eMax - eMin)) * h;
+            energyCtx.strokeStyle = '#cbd5e1';
+            energyCtx.lineWidth = 1;
+            energyCtx.setLineDash([5, 5]);
+            energyCtx.beginPath();
+            energyCtx.moveTo(0, yTrue);
+            energyCtx.lineTo(w, yTrue);
+            energyCtx.stroke();
+            energyCtx.setLineDash([]);
+
+            let plotColor = (integrator === 'implicit') ? '#10b981' : '#ef4444';
+            energyCtx.strokeStyle = plotColor;
+            energyCtx.lineWidth = 2;
+            energyCtx.beginPath();
+
+            for (let i = 0; i < energyHistory.length; i++) {
+                let px = (i / maxHistory) * w;
+                let py = h - ((energyHistory[i] - eMin) / (eMax - eMin)) * h;
+                
+                // Allow the line to cleanly exit the chart boundaries
+                py = Math.max(-10, Math.min(h + 10, py));
+                
+                if (i === 0) energyCtx.moveTo(px, py);
+                else energyCtx.lineTo(px, py);
+            }
+            energyCtx.stroke();
+        }
+
+        // Main Loop
+        function loop() {
+            if (isPlaying) {
+                // If the pendulum spins fast enough to break the math completely, stop trying to calculate
+                if (Math.abs(calcEnergy() - initialEnergy) > 100000) {
+                     // Pause
+                } else {
+                    for (let i = 0; i < substeps; i++) {
+                        if (integrator === 'implicit') stepImplicitMidpoint();
+                        else if (integrator === 'rk2') stepRK2();
+                    }
+                }
+                draw();
+                drawEnergyPlot();
+            }
+            requestAnimationFrame(loop);
+        }
+
+        // Initialization
+        resetSim();
+        loop();
+    </script>
+</body>
+</html>
