@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melvin Leok, Ph.D. | Computational Geometric Mechanics</title>
+    <title>Interactive Demonstrations | mleok.science</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -152,17 +152,10 @@
             margin-bottom: 10px;
         }
 
-        .hero p.title {
-            font-size: 1.2rem;
-            color: var(--ucsd-gold);
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
         .hero p.affiliation {
             font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 30px auto;
+            max-width: 800px;
+            margin: 0 auto;
             opacity: 0.9;
         }
 
@@ -173,202 +166,68 @@
             padding: 40px 5%;
         }
 
-        .section-title {
-            font-size: 2rem;
-            color: var(--ucsd-blue);
-            margin-bottom: 20px;
-            border-bottom: 3px solid var(--ucsd-gold);
-            display: inline-block;
-            padding-bottom: 5px;
-        }
-
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
             margin-bottom: 50px;
         }
 
-        .card {
+        .demo-card {
             background-color: var(--white);
             border-radius: 8px;
             padding: 30px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
-        .card:hover {
+        .demo-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
         }
 
-        .card h3 {
+        .demo-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: var(--ucsd-blue);
+        }
+
+        .demo-card h3 {
             color: var(--ucsd-blue);
             margin-bottom: 15px;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
         }
 
-        ul.styled-list {
-            list-style-position: inside;
+        .demo-card p {
             color: var(--text-light);
-        }
-
-        ul.styled-list li {
-            margin-bottom: 10px;
-        }
-
-        /* Expandable Publications Section */
-        .publications-container {
-            background-color: var(--white);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 50px;
-            overflow: hidden;
-        }
-
-        details {
-            width: 100%;
-        }
-
-        summary {
-            background-color: var(--ucsd-blue);
-            color: var(--white);
-            padding: 20px 30px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s ease;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        summary:hover {
-            background-color: #2A456C;
-        }
-
-        summary::after {
-            content: '+';
-            font-size: 1.5rem;
-            color: var(--ucsd-gold);
-            transition: transform 0.3s ease;
-        }
-
-        details[open] summary::after {
-            content: '−';
-            transform: rotate(180deg);
-        }
-
-        .publications-content {
-            padding: 30px;
-        }
-
-        .publication-item {
             margin-bottom: 25px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #EAEAEA;
+            flex-grow: 1;
         }
 
-        .publication-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .publication-title {
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 5px;
-        }
-
-        .publication-meta {
-            color: var(--text-light);
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-        }
-
-        /* Publication Links Styling */
-        .pub-links {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .pub-links a {
-            font-size: 0.85rem;
+        .demo-btn {
+            display: inline-block;
+            background-color: var(--white);
             color: var(--ucsd-blue);
-            text-decoration: none;
-            border: 1px solid var(--ucsd-blue);
-            padding: 4px 10px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            font-weight: 600;
-        }
-
-        .pub-links a:hover {
-            background-color: var(--ucsd-blue);
-            color: var(--white);
-        }
-
-        /* Contact Section */
-        .contact-info {
-            background: var(--white);
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 40px;
-            margin-bottom: 50px;
-        }
-
-        .contact-block {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .contact-block strong {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--ucsd-blue);
-        }
-
-/* Lecture Button Styling */
-        .lecture-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 15px;
-            padding: 8px 16px;
-            background-color: transparent;
-            color: var(--ucsd-blue);
-            border: 1.5px solid var(--ucsd-blue);
+            border: 2px solid var(--ucsd-blue);
+            padding: 10px 20px;
             border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.9rem;
+            text-align: center;
             transition: all 0.3s ease;
         }
 
-        .lecture-btn:hover {
+        .demo-btn:hover {
             background-color: var(--ucsd-blue);
             color: var(--white);
-            box-shadow: 0 4px 8px rgba(24, 43, 73, 0.2);
-        }
-
-        .lecture-btn svg {
-            width: 18px;
-            height: 18px;
-            transition: transform 0.3s ease;
-        }
-
-        .lecture-btn:hover svg {
-            transform: scale(1.1);
         }
 
         /* Footer */
@@ -383,7 +242,6 @@
 
         @media (max-width: 768px) {
             .hero h2 { font-size: 2.2rem; }
-            .publications-content { padding: 20px; }
         }
     </style>
 </head>
@@ -411,24 +269,54 @@
             <li><a href="index.html#contact" style="font-weight: 600;">Contact</a></li>
         </ul>
     </nav>
-    
+
     <header class="hero">
-        <h2>Curriculum Vitae</h2>
-        <p class="affiliation">Melvin Leok, Ph.D.</p>
+        <h2>Interactive Demonstrations</h2>
+        <p class="affiliation">Visualizing concepts in Computational Geometric Mechanics, Numerical Integration, and Geometric Control Theory.</p>
     </header>
 
     <div class="container">
-        <section id="cv-embed" style="text-align: center;">
-            <a href="mleok_vita.pdf" target="_blank" style="display: inline-block; margin-bottom: 20px; background-color: var(--ucsd-blue); color: var(--white); padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 600;">Download PDF Version</a>
+        <div class="grid">
             
-            <div style="border: 1px solid #ccc; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <iframe src="mleok_vita.pdf" width="100%" height="800px" style="border: none;">
-                    This browser does not support PDFs. Please download the PDF to view it.
-                </iframe>
+            <div class="demo-card">
+                <div class="demo-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h3>Kepler Planetary Orbit</h3>
+                <p>Observe the critical difference between standard numerical methods and geometric integrators. Watch Explicit Euler quickly spiral out of control while Symplectic Euler preserves orbital energy and bounds error indefinitely.</p>
+                <a href="simulation.html" class="demo-btn">Launch Simulation</a>
             </div>
-        </section>
+
+            <div class="demo-card">
+                <div class="demo-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                </div>
+                <h3>Chaotic Dynamics & Implicit Solvers</h3>
+                <p>The double pendulum has a non-separable Hamiltonian. Compare the energy drift of explicit methods against an Implicit Midpoint integrator utilizing a real-time nonlinear Newton-Raphson solver.</p>
+                <a href="chaotic-pendulum.html" class="demo-btn">Launch Simulation</a>
+            </div>
+
+            <div class="demo-card">
+                <div class="demo-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                </div>
+                <h3>Robotic Arm Kinematics</h3>
+                <p>A hands-on introduction to geometric control. Switch between controlling joint angles directly (Forward Kinematics) and having the system mathematically solve for target coordinates (Inverse Kinematics).</p>
+                <a href="robotic-arm.html" class="demo-btn">Launch Simulation</a>
+            </div>
+
+            <div class="demo-card">
+                <div class="demo-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                </div>
+                <h3>Quadrotor Tracking</h3>
+                <p>Visualize nonlinear robust tracking control. Command a planar drone with your mouse or watch it track a complex Figure-8 trajectory.</p>
+                <a href="drone-tracking.html" class="demo-btn">Launch Simulation</a>
+            </div>
+
+        </div>
     </div>
-    
+
     <footer>
         <p>&copy; 2026 Melvin Leok</p>
     </footer>
