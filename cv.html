@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melvin Leok, Ph.D. | Computational Geometric Mechanics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ucsd-blue: #182B49;
+            --ucsd-gold: #C69214;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #F7F9FC;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            min-height: 70px;
+        }
+
+        nav h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        nav h1 a {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-links li {
+            position: relative;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 400;
+            padding: 25px 15px;
+            display: block;
+            transition: color 0.3s, background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--ucsd-gold);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--ucsd-blue);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu li {
+            width: 100%;
+        }
+
+        .dropdown-menu a {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        /* Mobile Responsiveness for Nav */
+        @media (max-width: 992px) {
+            nav {
+                flex-direction: column;
+                padding: 15px 5%;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 10px;
+                gap: 0;
+            }
+            
+            .nav-links a {
+                padding: 10px 15px;
+            }
+            
+            .dropdown:hover .dropdown-menu {
+                position: static;
+                display: block;
+                box-shadow: none;
+                background-color: rgba(0,0,0,0.1);
+                border-radius: 0;
+            }
+            
+            .dropdown-menu a {
+                padding-left: 30px;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%);
+            color: var(--white);
+            padding: 80px 5%;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .hero p.title {
+            font-size: 1.2rem;
+            color: var(--ucsd-gold);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .hero p.affiliation {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            opacity: 0.9;
+        }
+
+        /* Container & Cards */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 5%;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--ucsd-blue);
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--ucsd-gold);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: var(--ucsd-blue);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        ul.styled-list {
+            list-style-position: inside;
+            color: var(--text-light);
+        }
+
+        ul.styled-list li {
+            margin-bottom: 10px;
+        }
+
+        /* Expandable Publications Section */
+        .publications-container {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 50px;
+            overflow: hidden;
+        }
+
+        details {
+            width: 100%;
+        }
+
+        summary {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            padding: 20px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary:hover {
+            background-color: #2A456C;
+        }
+
+        summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: var(--ucsd-gold);
+            transition: transform 0.3s ease;
+        }
+
+        details[open] summary::after {
+            content: '−';
+            transform: rotate(180deg);
+        }
+
+        .publications-content {
+            padding: 30px;
+        }
+
+        .publication-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #EAEAEA;
+        }
+
+        .publication-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .publication-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .publication-meta {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        /* Publication Links Styling */
+        .pub-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pub-links a {
+            font-size: 0.85rem;
+            color: var(--ucsd-blue);
+            text-decoration: none;
+            border: 1px solid var(--ucsd-blue);
+            padding: 4px 10px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .pub-links a:hover {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+        }
+
+        /* Contact Section */
+        .contact-info {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .contact-block {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .contact-block strong {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--ucsd-blue);
+        }
+
+/* Lecture Button Styling */
+        .lecture-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background-color: transparent;
+            color: var(--ucsd-blue);
+            border: 1.5px solid var(--ucsd-blue);
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .lecture-btn:hover {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            box-shadow: 0 4px 8px rgba(24, 43, 73, 0.2);
+        }
+
+        .lecture-btn svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .lecture-btn:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 2.2rem; }
+            .publications-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1><a href="/">mleok.science</a></h1>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="group.html">Research Group</a></li>
+            <li><a href="teaching.html">Teaching</a></li>
+            <li><a href="/#publications">Publications</a></li>
+            
+            <li class="dropdown">
+                <a href="#" aria-haspopup="true">More &#9662;</a>
+                <ul class="dropdown-menu">
+                    <li><a href="news.html">News & Announcements</a></li>
+                    <li><a href="talks.html">Talks & Media</a></li>
+                    <li><a href="software.html">Software & Code</a></li>
+                    <li><a href="/#honors">Honors & Awards</a></li>
+                </ul>
+            </li>
+            
+            <li><a href="/#contact" style="font-weight: 600; color: var(--ucsd-gold);">Contact</a></li>
+        </ul>
+    </nav>
+<header class="hero">
+        <h2>Curriculum Vitae</h2>
+        <p class="affiliation">Melvin Leok, Ph.D.</p>
+    </header>
+
+    <div class="container">
+        <section id="cv-embed" style="text-align: center;">
+            <a href="mleok_vita.pdf" target="_blank" style="display: inline-block; margin-bottom: 20px; background-color: var(--ucsd-blue); color: var(--white); padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 600;">Download PDF Version</a>
+            
+            <div style="border: 1px solid #ccc; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <iframe src="mleok_vita.pdf" width="100%" height="800px" style="border: none;">
+                    This browser does not support PDFs. Please download the PDF to view it.
+                </iframe>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <p>&copy; 2026 Melvin Leok</p>
+    </footer>
+
+</body>
+</html>
