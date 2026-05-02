@@ -139,30 +139,52 @@
             }
         }
 
-        /* Hero Section */
+        /* Hero Section with Headshot */
         .hero {
             background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%);
             color: var(--white);
             padding: 80px 5%;
-            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+        }
+
+        .profile-pic {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--ucsd-gold);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            flex-shrink: 0; /* Prevents image from squishing */
+        }
+
+        .hero-text {
+            text-align: left;
         }
 
         .hero h2 {
             font-size: 3rem;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            line-height: 1.1;
         }
 
         .hero p.title {
             font-size: 1.2rem;
             color: var(--ucsd-gold);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 600;
         }
 
         .hero p.affiliation {
             font-size: 1.1rem;
             max-width: 600px;
-            margin: 0 auto 30px auto;
             opacity: 0.9;
         }
 
@@ -338,39 +360,6 @@
             color: var(--ucsd-blue);
         }
 
-/* Lecture Button Styling */
-        .lecture-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 15px;
-            padding: 8px 16px;
-            background-color: transparent;
-            color: var(--ucsd-blue);
-            border: 1.5px solid var(--ucsd-blue);
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .lecture-btn:hover {
-            background-color: var(--ucsd-blue);
-            color: var(--white);
-            box-shadow: 0 4px 8px rgba(24, 43, 73, 0.2);
-        }
-
-        .lecture-btn svg {
-            width: 18px;
-            height: 18px;
-            transition: transform 0.3s ease;
-        }
-
-        .lecture-btn:hover svg {
-            transform: scale(1.1);
-        }
-
         /* Footer */
         footer {
             background-color: var(--ucsd-blue);
@@ -381,12 +370,29 @@
             opacity: 0.9;
         }
 
+        /* Mobile Breakpoints */
         @media (max-width: 768px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 25px;
+            }
+            .hero-text {
+                text-align: center;
+            }
+            .hero p.affiliation {
+                margin: 0 auto;
+            }
+            .profile-pic {
+                width: 160px;
+                height: 160px;
+            }
             .hero h2 { font-size: 2.2rem; }
             .publications-content { padding: 20px; }
         }
     </style>
 </head>
+
 <body>
 
     <nav>
@@ -412,16 +418,26 @@
     </nav>
 
 <header class="hero" id="about">
-        <h2>Melvin Leok, Ph.D.</h2>
-        <p class="title">Professor of Mathematics</p>
-        <p class="affiliation">Director, Computational Science, Mathematics and Engineering Graduate Program<br>University of California, San Diego</p>
-        
-        <div style="margin-top: 30px;">
-            <a href="cv.html" style="background-color: var(--ucsd-gold); color: var(--ucsd-blue); padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: transform 0.2s ease; display: inline-block;">
-                View Curriculum Vitae
-            </a>
+        <div class="hero-content">
+            <img src="mleok_thumbnail.png" alt="Melvin Leok, Ph.D." class="profile-pic">
+            
+            <div class="hero-text">
+                <h2>Melvin Leok, Ph.D.</h2>
+                <p class="title">Professor of Mathematics</p>
+                <p class="affiliation">Director, Computational Science, Mathematics and Engineering<br>University of California, San Diego</p>
+                
+                <div style="margin-top: 30px;">
+                    <a href="cv.html" style="background-color: var(--ucsd-gold); color: var(--ucsd-blue); padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: background-color 0.2s ease; display: inline-block;">
+                        Curriculum Vitae
+                    </a>
+                    <a href="https://mathml.ai" style="background-color: var(--ucsd-gold); color: var(--ucsd-blue); padding: 12px 24px; border-radius: 5px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: background-color 0.2s ease; display: inline-block;">
+                        Consulting
+                    </a>
+                </div>
+            </div>
         </div>
     </header>
+
 
     <div class="container">
         
