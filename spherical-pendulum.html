@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Dynamics on a Manifold | mleok.science</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ucsd-blue: #182B49;
+            --ucsd-gold: #C69214;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #F7F9FC;
+            --white: #FFFFFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); line-height: 1.6; }
+
+        /* Navigation */
+        nav { background-color: var(--ucsd-blue); color: var(--white); padding: 0 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; min-height: 70px; }
+        nav h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+        nav h1 a { color: var(--white); text-decoration: none; }
+        .nav-links { list-style: none; display: flex; align-items: center; gap: 5px; }
+        .nav-links li { position: relative; }
+        .nav-links a { color: var(--white); text-decoration: none; font-weight: 400; padding: 25px 15px; display: block; transition: all 0.3s; }
+        .nav-links a:hover { color: var(--ucsd-gold); background-color: rgba(255, 255, 255, 0.05); }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%); color: var(--white); padding: 40px 5%; text-align: center; }
+        .hero h2 { font-size: 2.2rem; margin-bottom: 10px; }
+        .hero p { opacity: 0.9; max-width: 900px; margin: 0 auto; }
+
+        /* Simulation Layout */
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 5%; display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+        
+        .controls { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; }
+        .controls h3 { margin-bottom: 15px; color: var(--ucsd-blue); border-bottom: 2px solid var(--ucsd-gold); padding-bottom: 5px; }
+        
+        .control-group { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .control-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; color: var(--ucsd-blue); }
+        .control-group p { font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px; line-height: 1.4; }
+        
+        input[type="range"] { width: 100%; margin-bottom: 5px; cursor: pointer; }
+        .slider-val { font-size: 0.85rem; font-weight: 600; color: var(--ucsd-gold); text-align: right; display: block; }
+        
+        select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; font-size: 0.95rem; margin-bottom: 10px; }
+
+        .btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-primary { background-color: var(--ucsd-blue); color: var(--white); }
+        .btn-primary:hover { background-color: #2A456C; }
+        .btn-secondary { background-color: #e2e8f0; color: var(--text-dark); }
+        .btn-secondary:hover { background-color: #cbd5e1; }
+
+        .sim-area { display: flex; flex-direction: column; gap: 20px; }
+        .canvas-container { background: var(--white); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 20px; text-align: center;}
+        canvas { border: 1px solid #e2e8f0; border-radius: 4px; max-width: 100%; }
+        #simCanvas { background: #0f172a; }
+        #energyCanvas, #normCanvas { background: #fafafa; }
+        
+        .canvas-title { font-weight: 600; margin-bottom: 5px; color: var(--text-dark); font-size: 1.2rem; }
+        .canvas-subtitle { font-size: 0.9rem; color: var(--text-light); margin-bottom: 15px; }
+
+        .telemetry { display: flex; justify-content: space-around; background: #f1f5f9; padding: 15px; border-radius: 6px; margin-top: 15px; font-family: monospace; font-size: 0.95rem; flex-wrap: wrap; gap: 10px; }
+        .warning { color: #ef4444; font-weight: bold; display: none; width: 100%; margin-top: 10px; }
+
+        footer { background-color: var(--ucsd-blue); color: var(--white); text-align: center; padding: 20px; font-size: 0.9rem; margin-top: 40px; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1><a href="index.html">mleok.science</a></h1>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="group.html">Group</a></li>
+            <li><a href="teaching.html">Teaching</a></li>
+            <li><a href="demos.html" style="color: var(--ucsd-gold);">Demos</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h2>Geometric Dynamics on a Manifold</h2>
+        <p>Simulating a particle constrained to the surface of a sphere. Standard methods (EE, RK4) integrate the analytical equations but fail to perfectly enforce the geometric manifold, eventually causing the particle to drift off the sphere. Geometric methods (RATTLE) perfectly preserve the constraint $|q|=1$ and bound the system energy.</p>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <h3>Simulation Parameters</h3>
+            
+            <div class="control-group">
+                <label>Numerical Integrator</label>
+                <select id="integratorSelect">
+                    <option value="geometric" selected>RATTLE Algorithm (Geometric)</option>
+                    <option value="rk4">Runge-Kutta 4 (Standard High-Order)</option>
+                    <option value="explicit">Explicit Euler (Standard Naive)</option>
+                </select>
+                <p id="integratorDesc">A true geometric integrator. It applies a constrained update that ensures the trajectory remains perfectly on the manifold (the surface of the sphere) indefinitely.</p>
+            </div>
+
+            <div class="control-group">
+                <label>Initial Polar Angle (&theta;)</label>
+                <input type="range" id="sliderTheta" min="10" max="170" step="1" value="70">
+                <span class="slider-val" id="valTheta">70&deg;</span>
+
+                <label style="margin-top: 15px;">Angular Velocity (&omega;)</label>
+                <input type="range" id="sliderOmega" min="0" max="8" step="0.5" value="3">
+                <span class="slider-val" id="valOmega">3.0 rad/s</span>
+            </div>
+
+            <button class="btn btn-primary" id="playBtn">Pause</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset Simulation</button>
+        </div>
+
+        <div class="sim-area">
+            
+            <div class="canvas-container">
+                <div class="canvas-title">Spherical Pendulum (3D Projection)</div>
+                <div class="canvas-subtitle">Visualizing the particle constrained to $S^2$.</div>
+                <canvas id="simCanvas" width="800" height="400"></canvas>
+                
+                <div class="telemetry">
+                    <div><strong>Manifold Constraint (|q|):</strong> <span id="out-norm">1.000</span></div>
+                    <div><strong>Total Energy:</strong> <span id="out-energy">0.000</span></div>
+                    <div id="manifoldWarning" class="warning">MANIFOLD DRIFT DETECTED: Particle has fallen off the sphere!</div>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <div class="canvas-title">Total Energy Evolution</div>
+                <div class="canvas-subtitle">Geometric methods bound energy error. Standard methods drift or explode.</div>
+                <canvas id="energyCanvas" width="800" height="150"></canvas>
+            </div>
+
+            <div class="canvas-container">
+                <div class="canvas-title">Manifold Constraint (|q| = 1)</div>
+                <div class="canvas-subtitle">Geometric methods perfectly preserve the surface constraint ($|q|=1$).</div>
+                <canvas id="normCanvas" width="800" height="150"></canvas>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Melvin Leok. Designed for mleok.science.</p>
+    </footer>
+
+    <script>
+        // Setup Canvases
+        const simCanvas = document.getElementById('simCanvas');
+        const ctx = simCanvas.getContext('2d');
+        const originX = simCanvas.width / 2;
+        const originY = simCanvas.height / 2 + 30;
+        const sphereScale = 140;
+
+        const energyCtx = document.getElementById('energyCanvas').getContext('2d');
+        const normCtx = document.getElementById('normCanvas').getContext('2d');
+        const graphW = 800; const graphH = 150;
+
+        // Physics Constants
+        const g = 9.81;
+        const dt = 0.03; // Large dt makes non-geometric failure highly visible
+        const substeps = 1;
+
+        // State: q = position vector, v = velocity vector
+        let q = [0, 0, 0];
+        let v = [0, 0, 0];
+        let isPlaying = true;
+        let integrator = 'geometric';
+        
+        let initialEnergy = 0;
+        const maxHistory = 400;
+        let trail3D = [];
+        let energyHistory = [];
+        let normHistory = [];
+
+        // UI Elements
+        const sliderTheta = document.getElementById('sliderTheta');
+        const sliderOmega = document.getElementById('sliderOmega');
+        const integratorSelect = document.getElementById('integratorSelect');
+        const integratorDesc = document.getElementById('integratorDesc');
+        const outNorm = document.getElementById('out-norm');
+        const outEnergy = document.getElementById('out-energy');
+        const manifoldWarning = document.getElementById('manifoldWarning');
+        const playBtn = document.getElementById('playBtn');
+
+        const descriptions = {
+            'geometric': "A true geometric integrator (RATTLE). It applies a mathematically constrained update ensuring the particle remains perfectly on the manifold ($S^2$) and bounds the energy indefinitely.",
+            'rk4': "A standard 4th-order method. While highly accurate initially, it ignores the geometric constraint. Over time, the particle will numerically drift completely off the sphere.",
+            'explicit': "A standard first-order method. It fails almost immediately, causing extreme energy injection and rapidly ejecting the particle off the sphere into space."
+        };
+
+        // Vector Math Helpers
+        function dot(a, b) { return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]; }
+        function mag(a) { return Math.sqrt(dot(a, a)); }
+        function scale(a, s) { return [a[0]*s, a[1]*s, a[2]*s]; }
+        function add(a, b) { return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]; }
+        function sub(a, b) { return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
+
+        // Core Analytical ODE (Used for EE and RK4)
+        // d²q/dt² = -g e3 + (g z - |v|²) q
+        function getAccel(pos, vel) {
+            let lambda_analytic = g * pos[2] - dot(vel, vel);
+            let acc = [
+                lambda_analytic * pos[0],
+                lambda_analytic * pos[1],
+                -g + lambda_analytic * pos[2]
+            ];
+            return acc;
+        }
+
+        // Calculate System Energy (Mass = 1)
+        function calcEnergy(pos, vel) {
+            return 0.5 * dot(vel, vel) + g * pos[2];
+        }
+
+        // --- INTEGRATORS ---
+
+        function stepExplicitEuler() {
+            let acc = getAccel(q, v);
+            q = add(q, scale(v, dt));
+            v = add(v, scale(acc, dt));
+        }
+
+        function stepRK4() {
+            let q1 = q, v1 = v;
+            let a1 = getAccel(q1, v1);
+            
+            let q2 = add(q, scale(v1, dt/2)), v2 = add(v, scale(a1, dt/2));
+            let a2 = getAccel(q2, v2);
+            
+            let q3 = add(q, scale(v2, dt/2)), v3 = add(v, scale(a2, dt/2));
+            let a3 = getAccel(q3, v3);
+            
+            let q4 = add(q, scale(v3, dt)), v4 = add(v, scale(a3, dt));
+            let a4 = getAccel(q4, v4);
+
+            q = add(q, scale(add(v1, add(scale(v2,2), add(scale(v3,2), v4))), dt/6));
+            v = add(v, scale(add(a1, add(scale(a2,2), add(scale(a3,2), a4))), dt/6));
+        }
+
+        function stepGeometricRATTLE() {
+            // RATTLE Algorithm rigorously preserves |q|=1 and q·v=0
+            let g_vec = [0, 0, -g];
+            
+            // 1. Estimate unconstrained next position
+            let q_temp = add(q, add(scale(v, dt), scale(g_vec, 0.5 * dt * dt)));
+            
+            // 2. Solve for constraint multiplier lambda to force |q_next| = 1
+            // |q_temp - 0.5 dt^2 lambda q|^2 = 1
+            let a = 0.25 * Math.pow(dt, 4);
+            let b = -dt * dt * dot(q_temp, q);
+            let c = dot(q_temp, q_temp) - 1.0;
+            
+            let discriminant = b * b - 4 * a * c;
+            let lambda = 0;
+            if (discriminant >= 0) {
+                // Stable quadratic root formulation
+                lambda = (2 * c) / (-b + Math.sqrt(discriminant));
+            }
+
+            let q_next = sub(q_temp, scale(q, 0.5 * dt * dt * lambda));
+            
+            // 3. Update velocity
+            let v_temp = add(v, scale(g_vec, dt));
+            v_temp = sub(v_temp, scale(q, 0.5 * dt * lambda));
+            
+            // Project velocity onto tangent space of q_next (forces q_next · v_next = 0)
+            let v_next = sub(v_temp, scale(q_next, dot(q_next, v_temp)));
+
+            q = q_next;
+            v = v_next;
+        }
+
+        // --- SYSTEM CONTROL ---
+        
+        function resetSim() {
+            let theta = parseFloat(sliderTheta.value) * Math.PI / 180;
+            let phi = 0; // Fixed start azimuth
+            let omega = parseFloat(sliderOmega.value);
+            
+            // Sphere Position (R=1)
+            q = [
+                Math.sin(theta) * Math.cos(phi),
+                Math.sin(theta) * Math.sin(phi),
+                Math.cos(theta)
+            ];
+
+            // Tangent velocity vector v = w x q
+            let w_vec = [0, 0, omega];
+            v = [
+                w_vec[1]*q[2] - w_vec[2]*q[1],
+                w_vec[2]*q[0] - w_vec[0]*q[2],
+                w_vec[0]*q[1] - w_vec[1]*q[0]
+            ];
+
+            trail3D = [];
+            energyHistory = [];
+            normHistory = [];
+            initialEnergy = calcEnergy(q, v);
+            manifoldWarning.style.display = 'none';
+            
+            draw(); 
+            drawGraphs();
+        }
+
+        // --- RENDERING ---
+
+        // Simple 3D to 2D isometric-style projection
+        function project3D(px, py, pz) {
+            const rotX = Math.PI / 8; // Tilt down
+            const rotY = -Math.PI / 6; // Pan side
+            
+            // Rotate Y
+            let x1 = px * Math.cos(rotY) - py * Math.sin(rotY);
+            let z1 = px * Math.sin(rotY) + py * Math.cos(rotY);
+            
+            // Rotate X
+            let y2 = z1 * Math.cos(rotX) - pz * Math.sin(rotX);
+            let z2 = z1 * Math.sin(rotX) + pz * Math.cos(rotX); // Depth
+
+            return { 
+                x: originX + x1 * sphereScale, 
+                y: originY - y2 * sphereScale, 
+                z: z2 
+            };
+        }
+
+        function drawSphereGrid() {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            
+            // Draw Equator and lines of latitude
+            for(let lat = -1; lat <= 1; lat += 0.5) {
+                ctx.beginPath();
+                for(let lon = 0; lon <= Math.PI*2.1; lon += 0.1) {
+                    let r = Math.sqrt(1 - lat*lat);
+                    let px = r * Math.cos(lon);
+                    let py = r * Math.sin(lon);
+                    let pz = lat;
+                    let proj = project3D(px, py, pz);
+                    if(lon === 0) ctx.moveTo(proj.x, proj.y);
+                    else ctx.lineTo(proj.x, proj.y);
+                }
+                ctx.stroke();
+            }
+
+            // Draw lines of longitude
+            for(let lon = 0; lon < Math.PI; lon += Math.PI/4) {
+                ctx.beginPath();
+                for(let lat = -Math.PI/2; lat <= Math.PI/2; lat += 0.1) {
+                    let px = Math.cos(lat) * Math.cos(lon);
+                    let py = Math.cos(lat) * Math.sin(lon);
+                    let pz = Math.sin(lat);
+                    let proj = project3D(px, py, pz);
+                    if(lat === -Math.PI/2) ctx.moveTo(proj.x, proj.y);
+                    else ctx.lineTo(proj.x, proj.y);
+                }
+                ctx.stroke();
+            }
+            
+            // Base Sphere Outline
+            ctx.beginPath();
+            ctx.arc(originX, originY, sphereScale, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Pivot Pole
+            ctx.beginPath();
+            ctx.moveTo(originX, originY - sphereScale - 20);
+            ctx.lineTo(originX, originY);
+            ctx.strokeStyle = 'var(--ucsd-gold)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, simCanvas.width, simCanvas.height);
+            drawSphereGrid();
+
+            let norm = mag(q);
+            let currentEnergy = calcEnergy(q, v);
+
+            if (isPlaying) {
+                trail3D.push([...q]);
+                if (trail3D.length > maxHistory) trail3D.shift();
+                
+                energyHistory.push(currentEnergy);
+                if (energyHistory.length > maxHistory) energyHistory.shift();
+
+                normHistory.push(norm);
+                if (normHistory.length > maxHistory) normHistory.shift();
+            }
+
+            // Draw Trail
+            if (trail3D.length > 1) {
+                ctx.beginPath();
+                let p0 = project3D(trail3D[0][0], trail3D[0][1], trail3D[0][2]);
+                ctx.moveTo(p0.x, p0.y);
+                for (let i = 1; i < trail3D.length; i++) {
+                    let p = project3D(trail3D[i][0], trail3D[i][1], trail3D[i][2]);
+                    ctx.lineTo(p.x, p.y);
+                }
+                ctx.strokeStyle = (integrator === 'geometric') ? '#10b981' : (integrator === 'rk4') ? '#3b82f6' : '#ef4444'; 
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            // Draw Particle
+            let projQ = project3D(q[0], q[1], q[2]);
+            ctx.beginPath();
+            // Scale size slightly based on depth for 3D effect
+            let size = 8 + (projQ.z * 3);
+            ctx.arc(projQ.x, projQ.y, Math.max(2, size), 0, Math.PI * 2);
+            ctx.fillStyle = 'var(--ucsd-gold)';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Draw string from origin
+            ctx.beginPath();
+            let projCenter = project3D(0,0,0);
+            ctx.moveTo(projCenter.x, projCenter.y);
+            ctx.lineTo(projQ.x, projQ.y);
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Telemetry
+            outNorm.innerText = norm.toFixed(4);
+            outEnergy.innerText = currentEnergy.toFixed(3);
+            
+            if (Math.abs(norm - 1.0) > 0.05) {
+                outNorm.style.color = '#ef4444'; 
+                manifoldWarning.style.display = 'block';
+            } else {
+                outNorm.style.color = 'var(--text-dark)';
+                manifoldWarning.style.display = 'none';
+            }
+        }
+
+        function drawGraph(ctxG, history, trueValue, range, color) {
+            ctxG.clearRect(0, 0, graphW, graphH);
+            if (history.length < 2) return;
+
+            const vMax = trueValue + range;
+            const vMin = trueValue - range;
+            
+            // True baseline
+            const yTrue = graphH - ((trueValue - vMin) / (vMax - vMin)) * graphH;
+            ctxG.strokeStyle = '#cbd5e1';
+            ctxG.lineWidth = 1;
+            ctxG.setLineDash([5, 5]);
+            ctxG.beginPath(); ctxG.moveTo(0, yTrue); ctxG.lineTo(graphW, yTrue); ctxG.stroke();
+            ctxG.setLineDash([]);
+
+            ctxG.strokeStyle = color;
+            ctxG.lineWidth = 2;
+            ctxG.beginPath();
+
+            for (let i = 0; i < history.length; i++) {
+                let px = (i / maxHistory) * graphW;
+                let py = graphH - ((history[i] - vMin) / (vMax - vMin)) * graphH;
+                py = Math.max(-10, Math.min(graphH + 10, py)); // Bound visual rendering
+                if (i === 0) ctxG.moveTo(px, py);
+                else ctxG.lineTo(px, py);
+            }
+            ctxG.stroke();
+        }
+
+        function drawGraphs() {
+            let plotColor = (integrator === 'geometric') ? '#10b981' : (integrator === 'rk4') ? '#3b82f6' : '#ef4444';
+            
+            // Energy Graph (zoom heavily to show RK4 drift vs Geometric bounds)
+            let energyRange = Math.abs(initialEnergy) * 0.05 + 0.1; 
+            drawGraph(energyCtx, energyHistory, initialEnergy, energyRange, plotColor);
+
+            // Norm Graph (True value = 1.0, look for drift)
+            drawGraph(normCtx, normHistory, 1.0, 0.05, plotColor);
+        }
+
+        // --- LISTENERS & LOOP ---
+        
+        sliderTheta.addEventListener('input', (e) => valTheta.innerText = e.target.value + '°');
+        sliderOmega.addEventListener('input', (e) => valOmega.innerText = parseFloat(e.target.value).toFixed(1) + ' rad/s');
+        
+        integratorSelect.addEventListener('change', (e) => {
+            integrator = e.target.value;
+            integratorDesc.innerText = descriptions[integrator];
+            resetSim(); 
+        });
+
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playBtn.innerText = isPlaying ? "Pause" : "Play";
+            playBtn.className = isPlaying ? "btn btn-primary" : "btn btn-secondary";
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', resetSim);
+
+        function loop() {
+            if (isPlaying) {
+                // If standard integrators explode, freeze to prevent NaN crashes
+                if (mag(q) > 5.0 || isNaN(q[0])) {
+                    // Paused due to explosion
+                } else {
+                    for (let i = 0; i < substeps; i++) {
+                        if (integrator === 'geometric') stepGeometricRATTLE();
+                        else if (integrator === 'rk4') stepRK4();
+                        else if (integrator === 'explicit') stepExplicitEuler();
+                    }
+                }
+                draw();
+                drawGraphs();
+            }
+            requestAnimationFrame(loop);
+        }
+
+        // Init
+        resetSim();
+        loop();
+    </script>
+    
+<!-- Default Statcounter code for mleok.science
+https://mleok.science -->
+<script type="text/javascript">
+var sc_project=10200462; 
+var sc_invisible=1; 
+var sc_security="2f6daca9"; 
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics"
+href="https://statcounter.com/" target="_blank"><img
+class="statcounter"
+src="https://c.statcounter.com/10200462/0/2f6daca9/1/"
+alt="Web Analytics"
+referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
+<!-- End of Statcounter Code -->
+
+</body>
+</html>
