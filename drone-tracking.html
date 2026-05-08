@@ -18,14 +18,116 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-dark); line-height: 1.6; }
 
-        /* Navigation */
-        nav { background-color: var(--ucsd-blue); color: var(--white); padding: 0 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; min-height: 70px; }
-        nav h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
-        nav h1 a { color: var(--white); text-decoration: none; }
-        .nav-links { list-style: none; display: flex; align-items: center; gap: 5px; }
-        .nav-links li { position: relative; }
-        .nav-links a { color: var(--white); text-decoration: none; font-weight: 400; padding: 25px 15px; display: block; transition: all 0.3s; }
-        .nav-links a:hover { color: var(--ucsd-gold); background-color: rgba(255, 255, 255, 0.05); }
+/* Navigation */
+        nav {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            min-height: 70px;
+        }
+
+        nav h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        nav h1 a {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-links li {
+            position: relative;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 400;
+            padding: 25px 15px;
+            display: block;
+            transition: color 0.3s, background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--ucsd-gold);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--ucsd-blue);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu li {
+            width: 100%;
+        }
+
+        .dropdown-menu a {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        /* Mobile Responsiveness for Nav */
+        @media (max-width: 992px) {
+            nav {
+                flex-direction: column;
+                padding: 15px 5%;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 10px;
+                gap: 0;
+            }
+            
+            .nav-links a {
+                padding: 10px 15px;
+            }
+            
+            .dropdown:hover .dropdown-menu {
+                position: static;
+                display: block;
+                box-shadow: none;
+                background-color: rgba(0,0,0,0.1);
+                border-radius: 0;
+            }
+            
+            .dropdown-menu a {
+                padding-left: 30px;
+            }
+        }
 
         /* Hero */
         .hero { background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%); color: var(--white); padding: 40px 5%; text-align: center; }
@@ -76,7 +178,21 @@
             <li><a href="/">Home</a></li>
             <li><a href="group.html">Group</a></li>
             <li><a href="teaching.html">Teaching</a></li>
-            <li><a href="demos.html" style="font-weight: 600; color: var(--ucsd-gold);">Demo: Drones</a></li>
+            <li><a href="demos.html" style="font-weight: 600; color: var(--ucsd-gold);">Demos</a></li>
+            
+            <li class="dropdown">
+                <a href="#" aria-haspopup="true">More &#9662;</a>
+                <ul class="dropdown-menu">
+                    <li><a href="book.html">Monograph / Book</a></li>
+                    <li><a href="index.html#publications">Publications</a></li>
+                    <li><a href="cv.html">Curriculum Vitae</a></li>
+                    <li><a href="news.html">News & Announcements</a></li>
+                    <li><a href="talks.html">Talks & Media</a></li>
+                    <li><a href="software.html">Software & Code</a></li>
+                </ul>
+            </li>
+                        
+            <li><a href="/#contact" style="font-weight: 600;">Contact</a></li>
         </ul>
     </nav>
 
@@ -91,17 +207,17 @@
             
             <div class="control-group">
                 <div class="radio-group">
-                    <label class="radio-item">
-                        <input type="radio" name="mode" value="manual" checked>
-                        <strong>Manual Target</strong>
-                    </label>
-                    <p>Click anywhere on the canvas to command the drone to a new position.</p>
-                    
                     <label class="radio-item" style="margin-top: 10px;">
-                        <input type="radio" name="mode" value="figure8">
+                        <input type="radio" name="mode" value="figure8" checked>
                         <strong>Figure-8 Tracking</strong>
                     </label>
                     <p>The drone will autonomously track an aggressive continuous trajectory.</p>
+                    
+                    <label class="radio-item">
+                        <input type="radio" name="mode" value="manual">
+                        <strong>Manual Target</strong>
+                    </label>
+                    <p>Click anywhere on the canvas to command the drone to a new position.</p>
                 </div>
             </div>
 
@@ -150,7 +266,7 @@
         // State Variables
         let state = { x: 400, y: 350, vx: 0, vy: 0, theta: 0, omega: 0 };
         let target = { x: 400, y: 225 };
-        let mode = 'manual';
+        let mode = 'figure8';
         let time = 0;
         const dt = 0.016; // ~60fps simulation step
 

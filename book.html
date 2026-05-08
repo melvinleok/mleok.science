@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Formulations of Lagrangian and Hamiltonian Dynamics on Manifolds | mleok.science</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ucsd-blue: #182B49;
+            --ucsd-gold: #C69214;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #F7F9FC;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            min-height: 70px;
+        }
+
+        nav h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        nav h1 a {
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-links li {
+            position: relative;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 400;
+            padding: 25px 15px;
+            display: block;
+            transition: color 0.3s, background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--ucsd-gold);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--ucsd-blue);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-menu li {
+            width: 100%;
+        }
+
+        .dropdown-menu a {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        /* Mobile Responsiveness for Nav */
+        @media (max-width: 992px) {
+            nav {
+                flex-direction: column;
+                padding: 15px 5%;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 10px;
+                gap: 0;
+            }
+            
+            .nav-links a {
+                padding: 10px 15px;
+            }
+            
+            .dropdown:hover .dropdown-menu {
+                position: static;
+                display: block;
+                box-shadow: none;
+                background-color: rgba(0,0,0,0.1);
+                border-radius: 0;
+            }
+            
+            .dropdown-menu a {
+                padding-left: 30px;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--ucsd-blue) 0%, #2A456C 100%);
+            color: var(--white);
+            padding: 60px 5%;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero p.subtitle {
+            font-size: 1.2rem;
+            color: var(--ucsd-gold);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .hero p.authors {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Container & Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 5%;
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        /* Book Cover & Links Sidebar */
+        .book-sidebar {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            text-align: center;
+            position: sticky;
+            top: 100px;
+        }
+
+        .book-cover {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            border: 1px solid #eaeaea;
+        }
+
+        .publisher-info {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #2A456C;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--ucsd-blue);
+            border: 2px solid var(--ucsd-blue);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+        }
+
+        /* Main Content Area */
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--ucsd-blue);
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--ucsd-gold);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .content-section {
+            margin-bottom: 40px;
+        }
+
+        .content-section p {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .feature-list {
+            list-style-type: none;
+        }
+
+        .feature-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--ucsd-gold);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Accordion for Table of Contents */
+        details {
+            background-color: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--ucsd-blue);
+            cursor: pointer;
+            background-color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        summary:hover {
+            background-color: #f1f5f9;
+        }
+
+        .toc-content {
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--ucsd-blue);
+            color: var(--white);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .book-grid {
+                grid-template-columns: 1fr;
+            }
+            .book-sidebar {
+                position: static;
+            }
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1><a href="index.html">mleok.science</a></h1>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="group.html">Group</a></li>
+            <li><a href="teaching.html">Teaching</a></li>
+            <li><a href="demos.html">Demos</a></li>
+            
+            <li class="dropdown">
+                <a href="#" aria-haspopup="true" style="font-weight: 600; color: var(--ucsd-gold);">More &#9662;</a>
+                <ul class="dropdown-menu">
+                    <li><a href="book.html"  style="font-weight: 600; color: var(--ucsd-gold);">Monograph / Book</a></li>
+                    <li><a href="index.html#publications">Publications</a></li>
+                    <li><a href="cv.html">Curriculum Vitae</a></li>
+                    <li><a href="news.html">News & Announcements</a></li>
+                    <li><a href="talks.html">Talks & Media</a></li>
+                    <li><a href="software.html">Software & Code</a></li>
+                </ul>
+            </li>
+            
+            <li><a href="index.html#contact" style="font-weight: 600;">Contact</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h2>Global Formulations of Lagrangian and Hamiltonian Dynamics on Manifolds</h2>
+        <p class="subtitle">A Geometric Approach to Modeling and Analysis</p>
+        <p class="authors">Taeyoung Lee &nbsp;|&nbsp; Melvin Leok &nbsp;|&nbsp; N. Harris McClamroch</p>
+    </header>
+
+    <div class="container">
+        <div class="book-grid">
+            
+            <aside class="book-sidebar">
+                <img src="book_cover.jpg" alt="Global Formulations of Lagrangian and Hamiltonian Dynamics on Manifolds" class="book-cover">
+
+                <div class="publisher-info">
+                    <strong>Publisher:</strong> Springer International<br>
+                    <strong>Series:</strong> Interaction of Mechanics and Mathematics (IMM)<br>
+                    <strong>ISBN:</strong> 978-3-319-56953-6<br>
+                    <strong>Pages:</strong> 539
+                </div>
+
+                <a href="https://link.springer.com/book/10.1007/978-3-319-56953-6" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                    View on SpringerLink
+                </a>
+                <a href="https://www.amazon.com/Formulations-Lagrangian-Hamiltonian-Dynamics-Manifolds/dp/3319569511" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                    Purchase on Amazon
+                </a>
+            </aside>
+
+            <main>
+                <div class="content-section">
+                    <h2 class="section-title">About the Book</h2>
+                    <p>This book provides an accessible introduction to the variational formulation of Lagrangian and Hamiltonian mechanics, with a novel emphasis on global descriptions of the dynamics. This represents a significant conceptual departure from more traditional approaches based on the use of local coordinates.</p>
+                    <p>In particular, we introduce a general methodology for obtaining globally valid equations of motion on configuration manifolds that are Lie groups, homogeneous spaces, and embedded manifolds. This geometric perspective natively avoids the difficulties associated with coordinate singularities (such as gimbal lock) that frequently plague standard analytical mechanics.</p>
+                    <p>The material is presented in an approachable fashion by considering concrete configuration manifolds of increasing complexity, which then motivates and naturally leads to the more general formulations. Understanding of the material is enhanced by numerous in-depth examples throughout the book, culminating in non-trivial applications involving multi-body systems.</p>
+                </div>
+
+                <div class="content-section">
+                    <h2 class="section-title">Key Features</h2>
+                    <ul class="feature-list">
+                        <li><strong>Global Perspective:</strong> Emphasizes formulations that hold everywhere on the configuration manifold, bypassing the limitations of local coordinate charts.</li>
+                        <li><strong>Geometric Mechanics Toolkit:</strong> Introduces essential differential geometric concepts (embedded manifolds, tangent/cotangent vectors, Lie groups) directly within the context of physical problems.</li>
+                        <li><strong>Avoiding Singularities:</strong> Demonstrates how to write globally valid equations of motion that are immune to coordinate singularities, highly relevant for aerospace, robotics, and computational control.</li>
+                        <li><strong>Pedagogical Structure:</strong> Written for a broad audience of mathematicians, engineers, and physicists. Basic background in differential geometry is helpful but not essential, as relevant concepts are built from the ground up.</li>
+                        <li><strong>Computational Relevance:</strong> Lays the rigorous continuous-time foundation required for constructing structure-preserving geometric integrators and geometric control algorithms.</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <h2 class="section-title">Table of Contents Summary</h2>
+                    
+                    <details>
+                        <summary>Chapter 1: Mathematical Background <span>&#9662;</span></summary>
+                        <div class="toc-content">
+                            A summary of the most important mathematical concepts used in the subsequent chapters. Differential geometric concepts of embedded manifolds, tangent vectors, and cotangent vectors are emphasized. Vector fields defined on embedded manifolds are introduced to characterize dynamic flows.
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary>Chapter 2: Kinematics <span>&#9662;</span></summary>
+                        <div class="toc-content">
+                            Kinematic relationships describe velocity vectors within a differential geometric setting. The concepts are rigorously defined for manifolds and illustrated by concrete physical examples.
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary>Chapter 3: Classical Lagrangian and Hamiltonian Dynamics <span>&#9662;</span></summary>
+                        <div class="toc-content">
+                            The classical development is followed in the case where the configuration manifold is the vector space. A Lagrangian function is introduced and variational methods are used to derive Euler–Lagrange equations and Hamilton's equations as a baseline.
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary>Chapter 4: Dynamics on Products of One-Spheres <span>&#9662;</span></summary>
+                        <div class="toc-content">
+                            Explores configuration manifolds that are a product of one-spheres (circles) embedded in a vector space, introducing variational methods to derive the dynamics for systems like coupled planar pendula.
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary>Chapter 5: Dynamics on Products of Two-Spheres <span>&#9662;</span></summary>
+                        <div class="toc-content">
+                            Extends the formulation to configuration manifolds that are a product of two-spheres, deriving global equations for complex spatial systems, including the spherical pendulum and multi-link chains.
+                        </div>
+                    </details>
+
+                    <details>
+                        <summary>Chapter 6: Dynamics on Special Orthogonal Groups, SO(3) <span>&#9662;</span></summary>
+                        <div class="toc-content">
+                            The configuration manifold is a product of copies of the special orthogonal group. Variational methods are used to derive globally valid equations of motion for rotating rigid body systems, bypassing Euler angles.
+                        </div>
+                    </details>
+                    
+                    <details>
+                        <summary>Advanced Chapters (7-11) <span>&#9662;</span></summary>
+                        <div class="toc-content">
+                            The latter half of the monograph extends these principles to the special Euclidean group SE(3), general Lie groups, homogeneous spaces, and arbitrary embedded manifolds, providing a fully unified geometric framework for analytical mechanics.
+                        </div>
+                    </details>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Melvin Leok. Designed for mleok.science.</p>
+    </footer>
+
+</body>
+</html>
