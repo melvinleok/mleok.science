@@ -385,6 +385,81 @@
             .hero h2 { font-size: 2.2rem; }
             .publications-content { padding: 20px; }
         }
+    
+        /* ---- Click-to-load YouTube facade ---- */
+        .yt-facade {
+            --yt-fallback: linear-gradient(135deg, #182B49 0%, #2c4a72 100%);
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #182B49;
+            background-image: var(--yt-fallback);
+            background-size: cover;
+            background-position: center;
+        }
+        .yt-facade.has-poster::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(24,43,73,.15) 0%, rgba(24,43,73,.6) 100%);
+        }
+        .yt-facade > a {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .yt-facade > a:focus-visible {
+            outline: 3px solid #C69214;
+            outline-offset: -6px;
+        }
+        .yt-facade-play {
+            width: 74px; height: 74px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, .4);
+            transition: transform .25s ease, background-color .25s ease;
+        }
+        .yt-facade-play::before {
+            content: "";
+            width: 0; height: 0;
+            margin-left: 7px;
+            border-left: 23px solid #182B49;
+            border-top: 14px solid transparent;
+            border-bottom: 14px solid transparent;
+        }
+        .yt-facade > a:hover .yt-facade-play,
+        .yt-facade > a:focus-visible .yt-facade-play {
+            transform: scale(1.09);
+            background: #C69214;
+        }
+        .yt-facade > a:hover .yt-facade-play::before,
+        .yt-facade > a:focus-visible .yt-facade-play::before {
+            border-left-color: #ffffff;
+        }
+        .yt-facade-note {
+            color: rgba(255, 255, 255, .92);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .yt-facade-play { transition: none; }
+            .yt-facade > a:hover .yt-facade-play { transform: none; }
+        }
     </style>
 </head>
 <body>
@@ -456,13 +531,16 @@
                 <h3>Research Vignette</h3>
                 <p>Prior to joining UCSD, I was an assistant professor at Purdue University. The department of mathematics commissioned a short video vignette where I describe my research in a broadly accessible fashion.</p>
                 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px; margin-top: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                    <iframe 
-                        src="https://www.youtube.com/embed/C_T9XeSkF1I?si=HIbWmMZfxwzbeMnM" 
-                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen
-                        title="Purdue Research Vignette">
-                    </iframe>
+                    <div class="yt-facade"
+                         data-yt-id="C_T9XeSkF1I"
+                         data-yt-title="Purdue Research Vignette"
+                         data-yt-poster="posters/C_T9XeSkF1I.jpg">
+                        <a href="https://www.youtube.com/watch?v=C_T9XeSkF1I" target="_blank" rel="noopener"
+                           aria-label="Play &quot;Purdue Research Vignette&quot;. The video loads from YouTube only when you activate it.">
+                            <span class="yt-facade-play" aria-hidden="true"></span>
+                            <span class="yt-facade-note">Click to load from YouTube</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -472,5 +550,56 @@
         <p>&copy; 2026 Melvin Leok</p>
     </footer>
     
+    <script>
+        /* ---- Click-to-load YouTube facade -------------------------------
+           No request reaches Google until the visitor activates a video.
+           Posters are served from this site, never from i.ytimg.com, which
+           is itself a Google host and would defeat the purpose.           */
+        (function () {
+            var facades = document.querySelectorAll('.yt-facade');
+            if (!facades.length) return;
+
+            function activate(facade) {
+                var id = facade.getAttribute('data-yt-id');
+                if (!id) return;
+                var frame = document.createElement('iframe');
+                frame.src = 'https://www.youtube-nocookie.com/embed/' +
+                            encodeURIComponent(id) + '?autoplay=1&rel=0';
+                frame.title = facade.getAttribute('data-yt-title') || 'YouTube video';
+                frame.setAttribute('frameborder', '0');
+                frame.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                frame.setAttribute('allowfullscreen', '');
+                frame.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                /* Fill the aspect-ratio box the facade occupied. Set inline so
+                   this works whether or not the page styles iframes itself. */
+                frame.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
+                facade.parentNode.replaceChild(frame, facade);
+                frame.focus();
+            }
+
+            Array.prototype.forEach.call(facades, function (facade) {
+                var poster = facade.getAttribute('data-yt-poster');
+                if (poster) {
+                    /* Probe the poster first. If it is missing, the gradient
+                       defined in CSS stays as-is and nothing looks broken, so
+                       the page works before posters are generated.          */
+                    var probe = new Image();
+                    probe.onload = function () {
+                        facade.style.backgroundImage =
+                            "url('" + poster + "'), var(--yt-fallback)";
+                        facade.classList.add('has-poster');
+                    };
+                    probe.src = poster;
+                }
+                var trigger = facade.querySelector('a');
+                if (!trigger) return;
+                trigger.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    activate(facade);
+                });
+            });
+        })();
+    </script>
+
 </body>
 </html>
