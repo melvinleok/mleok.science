@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melvin Leok, Ph.D. | Computational Geometric Mechanics</title>
+    <title>Teaching | Melvin Leok, Ph.D.</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -152,17 +152,10 @@
             margin-bottom: 10px;
         }
 
-        .hero p.title {
-            font-size: 1.2rem;
-            color: var(--ucsd-gold);
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
         .hero p.affiliation {
             font-size: 1.1rem;
             max-width: 600px;
-            margin: 0 auto 30px auto;
+            margin: 0 auto;
             opacity: 0.9;
         }
 
@@ -204,141 +197,11 @@
 
         .card h3 {
             color: var(--ucsd-blue);
-            margin-bottom: 15px;
+            margin-bottom: 5px;
             font-size: 1.3rem;
         }
 
-        ul.styled-list {
-            list-style-position: inside;
-            color: var(--text-light);
-        }
-
-        ul.styled-list li {
-            margin-bottom: 10px;
-        }
-
-        /* Expandable Publications Section */
-        .publications-container {
-            background-color: var(--white);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 50px;
-            overflow: hidden;
-        }
-
-        details {
-            width: 100%;
-        }
-
-        summary {
-            background-color: var(--ucsd-blue);
-            color: var(--white);
-            padding: 20px 30px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s ease;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        summary:hover {
-            background-color: #2A456C;
-        }
-
-        summary::after {
-            content: '+';
-            font-size: 1.5rem;
-            color: var(--ucsd-gold);
-            transition: transform 0.3s ease;
-        }
-
-        details[open] summary::after {
-            content: '−';
-            transform: rotate(180deg);
-        }
-
-        .publications-content {
-            padding: 30px;
-        }
-
-        .publication-item {
-            margin-bottom: 25px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #EAEAEA;
-        }
-
-        .publication-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .publication-title {
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 5px;
-        }
-
-        .publication-meta {
-            color: var(--text-light);
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-        }
-
-        /* Publication Links Styling */
-        .pub-links {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .pub-links a {
-            font-size: 0.85rem;
-            color: var(--ucsd-blue);
-            text-decoration: none;
-            border: 1px solid var(--ucsd-blue);
-            padding: 4px 10px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            font-weight: 600;
-        }
-
-        .pub-links a:hover {
-            background-color: var(--ucsd-blue);
-            color: var(--white);
-        }
-
-        /* Contact Section */
-        .contact-info {
-            background: var(--white);
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 40px;
-            margin-bottom: 50px;
-        }
-
-        .contact-block {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .contact-block strong {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--ucsd-blue);
-        }
-
-/* Lecture Button Styling */
+        /* Lecture Button Styling */
         .lecture-btn {
             display: inline-flex;
             align-items: center;
@@ -379,11 +242,11 @@
             padding: 20px;
             font-size: 0.9rem;
             opacity: 0.9;
+            margin-top: 40px;
         }
 
         @media (max-width: 768px) {
             .hero h2 { font-size: 2.2rem; }
-            .publications-content { padding: 20px; }
         }
     </style>
 </head>
@@ -394,45 +257,96 @@
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
             <li><a href="group.html">Group</a></li>
-            <li><a href="teaching.html">Teaching</a></li>
+            <li><a href="teaching.html" style="font-weight: 600; color: var(--ucsd-gold);">Teaching</a></li>
             <li><a href="demos.html">Demos</a></li>
             
             <li class="dropdown">
-                <a href="#" aria-haspopup="true" style="font-weight: 600; color: var(--ucsd-gold);">More &#9662;</a>
+                <a href="#" aria-haspopup="true">More &#9662;</a>
                 <ul class="dropdown-menu">
                     <li><a href="book.html">Monograph / Book</a></li>
                     <li><a href="index.html#publications">Publications</a></li>
                     <li><a href="cv.html">Curriculum Vitae</a></li>
                     <li><a href="news.html">News & Announcements</a></li>
                     <li><a href="talks.html">Talks & Media</a></li>
-                    <li><a href="software.html" style="font-weight: 600; color: var(--ucsd-gold);">Software & Code</a></li>
+                    <li><a href="software.html">Software & Code</a></li>
                 </ul>
             </li>
+
             
             <li><a href="/#contact" style="font-weight: 600;">Contact</a></li>
         </ul>
     </nav>
-
-<header class="hero">
-        <h2>Software & Code</h2>
-        <p class="affiliation">Implementations of geometric numerical algorithms.</p>
+    
+    <header class="hero">
+        <h2>Teaching & Coursework</h2>
+        <p class="affiliation">Recent courses, and online lecture archives.</p>
     </header>
 
     <div class="container">
-        <section id="repositories">
-            <div class="card" style="text-align: center; padding: 60px 20px;">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--ucsd-gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 20px;">
-                    <polyline points="16 18 22 12 16 6"></polyline>
-                    <polyline points="8 6 2 12 8 18"></polyline>
-                </svg>
-                <h3>Software Repositories</h3>
-                <p style="max-width: 600px; margin: 15px auto; color: var(--text-light);">
-                    The Computational Geometric Mechanics group actively develops algorithms for numerical integration, optimization on manifolds, and geometric control. 
-                </p>
+        <section id="current-teaching">
+            <h2 class="section-title">Recent Courses</h2>
+            <div class="grid">
                 
-                <div style="margin-top: 30px;">
-                    <a href="https://github.com/vduruiss/AccOpt_via_GNI" style="display: inline-block; background-color: var(--ucsd-blue); color: var(--white); padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 600;">Accelerated Optimization via Geometric Numerical Integration</a>
+                <div class="card">
+                    <h3>Optimization on Manifolds</h3>
+                    <p><strong>MATH 273C</strong> | Spring 2022</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Advanced topics in optimization techniques applied to smooth manifolds.</p>
+                    <a href="https://www.youtube.com/playlist?list=PLHZhjPByiV3K3PCGrCiTLbgq8o-Mbhn3b" class="lecture-btn">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Watch Lectures
+                    </a>
                 </div>
+
+                <div class="card">
+                    <h3>Information Geometry</h3>
+                    <p><strong>MATH 273B</strong> | Winter 2022</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Exploration of information geometry and its applications in statistical manifolds.</p>
+                    <a href="https://www.youtube.com/playlist?list=PLHZhjPByiV3L94AeJ9FcK1yrnRDOt3Vit" class="lecture-btn">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Watch Lectures
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>Numerical Methods for Physical Modeling</h3>
+                    <p><strong>MATH 174/274</strong> | Fall 2021</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Foundational numerical methods bridging mathematical theory and physical modeling.</p>
+                    <a href="https://www.youtube.com/playlist?list=PLHZhjPByiV3IAIswFcHaYLm22zsYWHi1Y" class="lecture-btn">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Watch Lectures
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>Geometric Numerical Integration</h3>
+                    <p><strong>MATH 273C</strong> | Spring 2021</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Applying discrete differential geometry to construct structure-preserving algorithms.</p>
+                    <a href="https://www.youtube.com/playlist?list=PLHZhjPByiV3JQnDImbh3pVxe8OfMuXDhm" class="lecture-btn">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Watch Lectures
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>Intro to Numerical Analysis: ODEs</h3>
+                    <p><strong>MATH 170C</strong> | Spring 2021</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Undergraduate introduction to numerical solutions for ordinary differential equations.</p>
+                    <a href="https://www.youtube.com/playlist?list=PLHZhjPByiV3Jetjo2YO9TYml0duas9Pc9" class="lecture-btn">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Watch Lectures
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>Applied and Computational Topology</h3>
+                    <p><strong>MATH 273A</strong> | Fall 2020</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Topological data analysis and computational geometry fundamentals.</p>
+                    <a href="https://www.youtube.com/playlist?list=PLHZhjPByiV3JLOtqsO_Bowj4DZIg5VP72" class="lecture-btn">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Watch Lectures
+                    </a>
+                </div>
+
             </div>
         </section>
     </div>
